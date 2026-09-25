@@ -1,0 +1,29 @@
+# Local secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.egg-info/
+
+# Frontend
+node_modules/
+dist/
+coverage/
+
+# Local tools and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
