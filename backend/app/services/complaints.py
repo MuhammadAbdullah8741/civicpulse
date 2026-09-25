@@ -6,6 +6,7 @@ from app.providers.triage.base import TriageProvider
 from app.repositories import complaints as repository
 from app.schemas import ComplaintCreate, ComplaintResponse, Status
 from app.services.status import allowed_transitions, validate_transition
+from app.services.triage import triage_with_fallback
 
 
 class ComplaintNotFoundError(Exception):
@@ -27,16 +28,19 @@ def create(
     payload: ComplaintCreate, provider: TriageProvider
 ) -> ComplaintResponse:
     started = perf_counter()
-    result = provider.triage(payload.text, payload.location)
+    complaint_id = uuid4()
+    result, triaged_by = triage_with_fallback(
+        provider, payload.text, payload.location, str(complaint_id)
+    )
     latency = max(0, round((perf_counter() - started) * 1000))
 
     row = repository.create({
         **payload.model_dump(),
-        "id": uuid4(),
+        "id": complaint_id,
         "category": result.category.value,
         "priority": result.priority.value,
         "ai_summary": result.summary,
-        "triaged_by": provider.name,
+        "triaged_by": triaged_by,
         "triage_latency_ms": latency,
     })
     return as_response(row)
@@ -75,3 +79,4 @@ def change_status(
             "Complaint status changed; refresh the complaint and retry."
         )
     return as_response(updated)
+
