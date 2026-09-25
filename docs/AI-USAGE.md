@@ -19,3 +19,17 @@ Verification:
 - Result: 1 passed.
 - Started the backend and confirmed /health returned {"status":"ok"}.
 - GitHub Actions verification is pending.
+
+## Database and Compose implementation
+
+ChatGPT supplied the initial Compose configuration, backend Dockerfile,
+database connection module, Alembic migration, synthetic seed complaints,
+database tests, and CI database job.
+
+Verified locally:
+- Migration reached 0001 (head).
+- First seed inserted 30 complaints.
+- Repeating the seed inserted zero additional complaints.
+- All 30 complaints survived Compose down/up.
+
+Database test and CI results will be recorded after execution.
