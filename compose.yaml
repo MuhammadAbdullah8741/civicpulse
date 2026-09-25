@@ -55,6 +55,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       REDIS_URL: redis://cache:6379/0
       TRIAGE_PROVIDER: ${TRIAGE_PROVIDER:-simulated}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -94,4 +96,6 @@ networks:
 volumes:
   pgdata:
   redisdata:
+
+
 
