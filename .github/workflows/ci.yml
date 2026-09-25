@@ -63,7 +63,7 @@ jobs:
         run: docker compose exec -T backend alembic upgrade head
 
       - name: Run tests against PostgreSQL
-        run: docker compose exec -T -e RUN_DB_TESTS=1 backend python -m pytest -q -p no:cacheprovider
+        run: docker compose exec -T -e RUN_DB_TESTS=1 backend python -m pytest -q -p no:cacheprovider --cov=app --cov-report=term-missing --cov-fail-under=65
 
       - name: Verify repeatable seed
         run: |
@@ -75,3 +75,4 @@ jobs:
       - name: Stop temporary services
         if: always()
         run: docker compose down -v
+

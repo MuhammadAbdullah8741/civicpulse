@@ -33,3 +33,21 @@ Verified locally:
 - All 30 complaints survived Compose down/up.
 
 Database test and CI results will be recorded after execution.
+
+## Complaint API and readiness
+
+ChatGPT supplied complaint validation schemas, the status transition table,
+repository operations, service and route layers, a basic keyword triage
+provider, readiness checks, and automated tests.
+
+Verified locally:
+- Complaint creation, retrieval, and filtered pagination worked.
+- A valid status transition succeeded.
+- An invalid transition returned HTTP 409 with the attempted transition.
+- Automated tests: 53 passed.
+- Backend statement coverage: 86%.
+
+Current limitation:
+The API uses the rules provider directly. Environment-based provider
+selection, hosted AI, retry/fallback orchestration, caching, rate limiting,
+structured logging, and metrics remain to be implemented.
