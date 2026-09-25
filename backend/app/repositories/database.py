@@ -24,3 +24,9 @@ def get_engine() -> Engine:
         max_overflow=5,
         connect_args={"connect_timeout": 3},
     )
+
+def check_database() -> None:
+    from sqlalchemy import text
+
+    with get_engine().connect() as connection:
+        connection.execute(text("SELECT 1"))
