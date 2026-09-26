@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 
 from app.providers.triage.base import TriageProvider
 from app.providers.triage.factory import create_provider
@@ -15,6 +15,7 @@ from app.schemas import (
     StatusUpdate,
 )
 from app.services import complaints as service
+from app.services.rate_limit import check
 
 router = APIRouter(prefix="/api/complaints", tags=["complaints"])
 
@@ -26,8 +27,10 @@ def get_triage_provider() -> TriageProvider:
 @router.post("", response_model=ComplaintResponse, status_code=201)
 def create_complaint(
     payload: ComplaintCreate,
+    request: Request,
     provider: Annotated[TriageProvider, Depends(get_triage_provider)],
 ):
+    check(request.client.host if request.client else "unknown")
     return service.create(payload, provider)
 
 
