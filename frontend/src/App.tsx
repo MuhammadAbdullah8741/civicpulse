@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Submit } from './pages/Submit';
 import { Dashboard } from './pages/Dashboard';
+import { Stats } from './pages/Stats';
 
 const views = {
-  Dashboard: {title: 'The neighbourhood queue', description: 'Complaint filters, pagination and status actions will be added in the dashboard phase.'},
-  'Submit report': {title: 'Report a local issue', description: 'The citizen submission form will be added in the next phase.'},
-  Statistics: {title: 'Your city at a glance', description: 'Live category counts and cache visibility will be connected in the statistics phase.'},
+  Dashboard: true,
+  'Submit report': true,
+  Statistics: true,
 };
 type View = keyof typeof views;
 export default function App() {
@@ -24,11 +25,7 @@ export default function App() {
         <button key={label} aria-current={page === label ? 'page' : undefined}
           className={page === label ? 'active' : ''} onClick={() => setPage(label)}>{label}</button>
       )}</nav>
-      {page === 'Submit report' ? <Submit/> : page === 'Dashboard' ? <Dashboard/> : <section className="panel" aria-labelledby="view-title">
-        <span className="eyebrow">FRONTEND FOUNDATION</span>
-        <h2 id="view-title">{views[page].title}</h2>
-        <p className="muted">{views[page].description}</p>
-      </section>}
+      {page === 'Submit report' ? <Submit/> : page === 'Dashboard' ? <Dashboard/> : <Stats/>}
     </main>
     <footer>CivicPulse · Built for clearer municipal response.<span>Use synthetic test data</span></footer>
   </>;
