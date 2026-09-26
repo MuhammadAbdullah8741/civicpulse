@@ -56,6 +56,40 @@ export interface paths {
         patch: operations["update_complaint_status_api_complaints__complaint_id__status_patch"];
         trace?: never;
     };
+    "/api/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stats */
+        get: operations["stats_api_stats_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/meta/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Providers */
+        get: operations["providers_api_meta_providers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -147,6 +181,54 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** StatsResponse */
+        StatsResponse: {
+            /** Total */
+            total: number;
+            /** By Category */
+            by_category: {
+                [key: string]: number;
+            };
+            /** By Priority */
+            by_priority: {
+                [key: string]: number;
+            };
+            /** By Status */
+            by_status: {
+                [key: string]: number;
+            };
+        };
+        /** ProviderMetadata */
+        ProviderMetadata: {
+            /** Active Provider */
+            active_provider: string;
+            /** Cache Ttl Seconds */
+            cache_ttl_seconds: number;
+            /** Triage Requests */
+            triage_requests: number;
+            /** Cache Hits */
+            cache_hits: number;
+            /** Cache Hit Rate */
+            cache_hit_rate: number;
+            /** Recent Outcomes */
+            recent_outcomes: components["schemas"]["TriageOutcome"][];
+        };
+        /** TriageOutcome */
+        TriageOutcome: {
+            /** Provider */
+            provider: string;
+            /** Latency Ms */
+            latency_ms: number;
+            /** Fallback */
+            fallback: boolean;
+            /** Cache Hit */
+            cache_hit: boolean;
+            /**
+             * Timestamp
+             * Format: date-time
+             */
+            timestamp: string;
         };
     };
     responses: never;
@@ -287,6 +369,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    stats_api_stats_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StatsResponse"];
+                };
+            };
+        };
+    };
+    providers_api_meta_providers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProviderMetadata"];
                 };
             };
         };

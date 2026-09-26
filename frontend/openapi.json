@@ -244,6 +244,48 @@
           }
         }
       }
+    },
+    "/api/stats": {
+      "get": {
+        "tags": [
+          "statistics"
+        ],
+        "summary": "Stats",
+        "operationId": "stats_api_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/meta/providers": {
+      "get": {
+        "tags": [
+          "observability"
+        ],
+        "summary": "Providers",
+        "operationId": "providers_api_meta_providers_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderMetadata"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -492,6 +534,118 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "StatsResponse": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "by_category": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Category"
+          },
+          "by_priority": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Priority"
+          },
+          "by_status": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "by_category",
+          "by_priority",
+          "by_status"
+        ],
+        "title": "StatsResponse"
+      },
+      "ProviderMetadata": {
+        "properties": {
+          "active_provider": {
+            "type": "string",
+            "title": "Active Provider"
+          },
+          "cache_ttl_seconds": {
+            "type": "integer",
+            "title": "Cache Ttl Seconds"
+          },
+          "triage_requests": {
+            "type": "integer",
+            "title": "Triage Requests"
+          },
+          "cache_hits": {
+            "type": "integer",
+            "title": "Cache Hits"
+          },
+          "cache_hit_rate": {
+            "type": "number",
+            "title": "Cache Hit Rate"
+          },
+          "recent_outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/TriageOutcome"
+            },
+            "type": "array",
+            "title": "Recent Outcomes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "active_provider",
+          "cache_ttl_seconds",
+          "triage_requests",
+          "cache_hits",
+          "cache_hit_rate",
+          "recent_outcomes"
+        ],
+        "title": "ProviderMetadata"
+      },
+      "TriageOutcome": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          },
+          "fallback": {
+            "type": "boolean",
+            "title": "Fallback"
+          },
+          "cache_hit": {
+            "type": "boolean",
+            "title": "Cache Hit"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider",
+          "latency_ms",
+          "fallback",
+          "cache_hit",
+          "timestamp"
+        ],
+        "title": "TriageOutcome"
       }
     }
   }

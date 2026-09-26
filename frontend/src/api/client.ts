@@ -24,7 +24,7 @@ function detailMessage(body: unknown, status: number): string {
   if (typeof body === 'object' && body !== null && 'detail' in body && typeof body.detail === 'string') return body.detail;
   return `Request failed (${status}). Please try again.`;
 }
-async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function requestWithHeaders<T>(path: string, options: RequestInit = {}): Promise<{data: T; headers: Headers}> {
   const response = await fetch(path, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers },
@@ -32,9 +32,20 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) throw new ApiError(detailMessage(body, response.status), response.status, response.headers.get('Retry-After'), fieldErrors(body));
   if (body === null) throw new ApiError('The server returned an empty or invalid response.', response.status, null);
-  return body as T;
+  return {data: body as T, headers: response.headers};
 }
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  return (await requestWithHeaders<T>(path, options)).data;
+}
+export type StatsData = components['schemas']['StatsResponse'];
+export type ProviderMetadata = components['schemas']['ProviderMetadata'];
+export type StatsResult = {data: StatsData; cache: string | null};
 export const api = {
+  stats: async (): Promise<StatsResult> => {
+    const result = await requestWithHeaders<StatsData>('/api/stats');
+    return {data: result.data, cache: result.headers.get('X-Cache')};
+  },
+  providers: () => request<ProviderMetadata>('/api/meta/providers'),
   create: (body: ComplaintInput) => request<Complaint>('/api/complaints', {method: 'POST', body: JSON.stringify(body)}),
   get: (id: string) => request<Complaint>(`/api/complaints/${encodeURIComponent(id)}`),
   list: (filters: Filters = {}) => {
