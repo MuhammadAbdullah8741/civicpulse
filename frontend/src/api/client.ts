@@ -8,8 +8,14 @@ export type Category = components['schemas']['Category'];
 export type Priority = components['schemas']['Priority'];
 export type Filters = {page?: number; page_size?: number; category?: Category; priority?: Priority; status?: Status};
 
+export type FieldError = {field: string; message: string};
+function fieldErrors(body: unknown): FieldError[] {
+  if (!body || typeof body !== 'object' || !('errors' in body) || !Array.isArray(body.errors)) return [];
+  return body.errors.filter((item): item is FieldError =>
+    item !== null && typeof item === 'object' && typeof item.field === 'string' && typeof item.message === 'string');
+}
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public retryAfter: string | null) {
+  constructor(message: string, public status: number, public retryAfter: string | null, public fields: FieldError[] = []) {
     super(message);
     this.name = 'ApiError';
   }
@@ -24,7 +30,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...options.headers },
   });
   const body: unknown = await response.json().catch(() => null);
-  if (!response.ok) throw new ApiError(detailMessage(body, response.status), response.status, response.headers.get('Retry-After'));
+  if (!response.ok) throw new ApiError(detailMessage(body, response.status), response.status, response.headers.get('Retry-After'), fieldErrors(body));
   if (body === null) throw new ApiError('The server returned an empty or invalid response.', response.status, null);
   return body as T;
 }
