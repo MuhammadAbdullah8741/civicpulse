@@ -1,0 +1,20 @@
+# Allow only the inputs needed for the build and runtime configuration.
+**
+!package.json
+!package-lock.json
+!index.html
+!tsconfig.json
+!vite.config.ts
+!src/
+!src/**
+!nginx.conf
+!docker-entrypoint.sh
+# Keep secrets and development material excluded even under src/.
+**/.env
+**/.env.*
+**/node_modules
+**/.git
+**/.venv
+**/__pycache__
+**/*.pyc
+**/fixtures
