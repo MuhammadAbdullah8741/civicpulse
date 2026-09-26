@@ -4,6 +4,8 @@ from time import sleep
 
 import httpx
 
+from app.observability import FALLBACKS
+
 from app.providers.triage.base import TriageProvider, TriageResult
 from app.providers.triage.rules import RuleBasedTriage
 
@@ -36,12 +38,12 @@ def triage_with_fallback(
                 sleep(uniform(0.1, 0.3))
                 continue
 
-            logger.warning(
-                "triage_fallback complaint_id=%s provider=%s error_class=%s",
-                complaint_id,
-                provider.name,
-                type(error).__name__,
-            )
+            FALLBACKS.inc()
+            logger.warning("triage_fallback", extra={
+                "complaint_id": complaint_id,
+                "provider": provider.name,
+                "error_class": type(error).__name__,
+            })
             break
 
     fallback = RuleBasedTriage().triage(text, location)

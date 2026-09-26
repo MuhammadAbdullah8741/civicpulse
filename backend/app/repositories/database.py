@@ -30,3 +30,11 @@ def check_database() -> None:
 
     with get_engine().connect() as connection:
         connection.execute(text("SELECT 1"))
+
+
+def close_database() -> None:
+    if get_engine.cache_info().currsize:
+        try:
+            get_engine().dispose()
+        finally:
+            get_engine.cache_clear()

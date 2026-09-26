@@ -7,6 +7,7 @@ from app.repositories import complaints as repository
 from app.schemas import ComplaintCreate, ComplaintResponse, Status
 from app.services.status import allowed_transitions, validate_transition
 from app.services.triage_cache import triage_with_cache
+from app.services.stats import invalidate
 
 
 class ComplaintNotFoundError(Exception):
@@ -43,6 +44,7 @@ def create(
         "triaged_by": triaged_by,
         "triage_latency_ms": latency,
     })
+    invalidate()
     return as_response(row)
 
 
@@ -78,5 +80,6 @@ def change_status(
         raise ConcurrentUpdateError(
             "Complaint status changed; refresh the complaint and retry."
         )
+    invalidate()
     return as_response(updated)
 

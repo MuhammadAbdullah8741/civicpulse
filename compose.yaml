@@ -59,6 +59,8 @@ services:
       GROQ_MODEL: ${GROQ_MODEL:-openai/gpt-oss-20b}
       OLLAMA_BASE_URL: http://ollama:11434
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:1b}
+      RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-10}
+      RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -81,6 +83,12 @@ services:
       - --port
       - "8000"
       - --reload
+      - --timeout-graceful-shutdown
+      - "35"
+      - --log-config
+      - logging.json
+      - --no-access-log
+    stop_grace_period: 45s
     restart: unless-stopped
     deploy:
       resources:

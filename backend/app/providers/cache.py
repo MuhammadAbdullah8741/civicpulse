@@ -16,3 +16,11 @@ def get_cache() -> Redis:
 
 def check_cache() -> None:
     get_cache().ping()
+
+
+def close_cache() -> None:
+    if get_cache.cache_info().currsize:
+        try:
+            get_cache().close()
+        finally:
+            get_cache.cache_clear()
