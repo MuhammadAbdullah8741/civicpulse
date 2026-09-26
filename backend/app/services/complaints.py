@@ -6,7 +6,7 @@ from app.providers.triage.base import TriageProvider
 from app.repositories import complaints as repository
 from app.schemas import ComplaintCreate, ComplaintResponse, Status
 from app.services.status import allowed_transitions, validate_transition
-from app.services.triage import triage_with_fallback
+from app.services.triage_cache import triage_with_cache
 
 
 class ComplaintNotFoundError(Exception):
@@ -29,7 +29,7 @@ def create(
 ) -> ComplaintResponse:
     started = perf_counter()
     complaint_id = uuid4()
-    result, triaged_by = triage_with_fallback(
+    result, triaged_by = triage_with_cache(
         provider, payload.text, payload.location, str(complaint_id)
     )
     latency = max(0, round((perf_counter() - started) * 1000))
