@@ -9,6 +9,7 @@ from typing import Any
 from redis.exceptions import RedisError
 
 from app.providers.cache import get_cache
+from app.observability import TRIAGE_LATENCY, metric_provider
 from app.providers.triage.base import TriageProvider, TriageResult
 from app.services.triage import triage_with_fallback
 
@@ -88,7 +89,9 @@ def triage_with_cache(
             except RedisError:
                 pass
 
-    latency_ms = max(0, round((perf_counter() - started) * 1000))
+    elapsed = perf_counter() - started
+    TRIAGE_LATENCY.labels(metric_provider(actual_provider)).observe(elapsed)
+    latency_ms = max(0, round(elapsed * 1000))
     record_outcome(actual_provider, latency_ms, cache_hit)
     return result, actual_provider
 
