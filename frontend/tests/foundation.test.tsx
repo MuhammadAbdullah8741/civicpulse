@@ -1,12 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App';
+import { api } from '../src/api/client';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 
 describe('frontend foundation', () => {
-  it('opens the dashboard with accessible navigation', () => {
+  beforeEach(() => {vi.spyOn(api, 'list').mockResolvedValue({items:[],total:0,page:1,page_size:10});});
+  it('opens the dashboard with accessible navigation', async () => {
     render(<App/>);
+    await screen.findByText('No reports match these filters.');
     expect(screen.getByRole('navigation', {name: 'Main navigation'})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'The neighbourhood queue'})).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Dashboard'})).toHaveAttribute('aria-current', 'page');
