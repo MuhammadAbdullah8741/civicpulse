@@ -3,7 +3,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
 
-from app.providers.triage.rules import RuleBasedTriage
+from app.providers.triage.base import TriageProvider
+from app.providers.triage.factory import create_provider
 from app.schemas import (
     Category,
     ComplaintCreate,
@@ -18,14 +19,14 @@ from app.services import complaints as service
 router = APIRouter(prefix="/api/complaints", tags=["complaints"])
 
 
-def get_triage_provider() -> RuleBasedTriage:
-    return RuleBasedTriage()
+def get_triage_provider() -> TriageProvider:
+    return create_provider()
 
 
 @router.post("", response_model=ComplaintResponse, status_code=201)
 def create_complaint(
     payload: ComplaintCreate,
-    provider: Annotated[RuleBasedTriage, Depends(get_triage_provider)],
+    provider: Annotated[TriageProvider, Depends(get_triage_provider)],
 ):
     return service.create(payload, provider)
 
@@ -49,3 +50,4 @@ def get_complaint(complaint_id: UUID):
 @router.patch("/{complaint_id}/status", response_model=ComplaintResponse)
 def update_complaint_status(complaint_id: UUID, payload: StatusUpdate):
     return service.change_status(complaint_id, payload.status)
+

@@ -1,53 +1,40 @@
 # AI assistance record
 
-## Initial project setup
+Tool: ChatGPT/Codex. The assistant supplied substantial implementation code,
+PowerShell commands, tests and documentation. The students installed files,
+ran commands and supplied terminal output. AI authorship is disclosed; partner
+contributions and review must be recorded honestly under their own identities.
 
-Tool: ChatGPT.
+## Supplied work
 
-ChatGPT supplied PowerShell setup commands, the initial FastAPI application,
-the health endpoint, its pytest test, and the initial GitHub Actions workflow.
+Initial FastAPI setup, Docker and Compose configuration, PostgreSQL/Alembic
+schema, seed data, complaint API and state machine, readiness checks, GitHub CI,
+triage interface and four providers, retry/fallback, Redis triage caching,
+provider-history endpoint, test cases and provider/privacy documentation.
 
-The health endpoint has no database dependency to meet the assignment's
-liveness requirement.
+## Changes made during the guided work
 
-Student verification and subsequent changes:
-Pending execution and review. Update this section with actual test results,
-changes made, and the reasons for those changes.
+- Coverage output moved to /tmp because the non-root container could not write
+  its SQLite coverage file in the mounted /app directory on the CI runner.
+- Groq model changed from llama-3.1-8b-instant to openai/gpt-oss-20b after an
+  actual 404/model_not_found response and account model-list inspection.
+- Ollama was initially deferred because of download size, then restored with
+  the local-ai profile and persistent volume following the student's decision.
+- Cached fallback results are excluded so temporary outages do not suppress
+  recovery for 24 hours. CI explicitly selects simulated triage.
 
-Verification:
-- Ran the health endpoint test inside a Python 3.12 Docker container.
-- Result: 1 passed.
-- Started the backend and confirmed /health returned {"status":"ok"}.
-- GitHub Actions verification is pending.
+## Observed verification from student terminal output
 
-## Database and Compose implementation
+- Initial health test: 1 passed; /health returned status ok.
+- Seed inserted 30 rows, repeat inserted zero; Compose down/up preserved rows.
+- Complaint API phase: 53 tests passed, approximately 86% coverage.
+- Ollama phase: 72 tests passed, 87.63% coverage; live Ollama returned water/high.
+- Cache phase: 79 tests passed, 90.08% coverage; controlled duplicate-input hit
+  rate 50% (1 hit / 2 requests), provider history endpoint succeeded.
 
-ChatGPT supplied the initial Compose configuration, backend Dockerfile,
-database connection module, Alembic migration, synthetic seed complaints,
-database tests, and CI database job.
+## Pending verification and ownership
 
-Verified locally:
-- Migration reached 0001 (head).
-- First seed inserted 30 complaints.
-- Repeating the seed inserted zero additional complaints.
-- All 30 complaints survived Compose down/up.
-
-Database test and CI results will be recorded after execution.
-
-## Complaint API and readiness
-
-ChatGPT supplied complaint validation schemas, the status transition table,
-repository operations, service and route layers, a basic keyword triage
-provider, readiness checks, and automated tests.
-
-Verified locally:
-- Complaint creation, retrieval, and filtered pagination worked.
-- A valid status transition succeeded.
-- An invalid transition returned HTTP 409 with the attempted transition.
-- Automated tests: 53 passed.
-- Backend statement coverage: 86%.
-
-Current limitation:
-The API uses the rules provider directly. Environment-based provider
-selection, hosted AI, retry/fallback orchestration, caching, rate limiting,
-structured logging, and metrics remain to be implemented.
+Final prompt-injection/transport tests, updated CI and partner review must be
+run and their actual results recorded. The team must understand and explain
+all generated code at viva. This document does not claim that AI-generated
+work was independently written by either partner or that unrun tests passed.

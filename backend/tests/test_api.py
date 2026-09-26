@@ -65,7 +65,7 @@ def test_complaint_lifecycle_against_postgres():
             assert data["category"] == "water"
             assert data["priority"] == "high"
             assert data["status"] == "open"
-            assert data["triaged_by"] == "rules"
+            assert data["triaged_by"] == "simulated"
             assert data["triage_latency_ms"] >= 0
 
             path = f"/api/complaints/{complaint_id}"
@@ -123,3 +123,4 @@ def test_complaint_lifecycle_against_postgres():
                     text("DELETE FROM complaints WHERE id = :id"),
                     {"id": complaint_id},
                 )
+

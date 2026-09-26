@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from app.routes.complaints import router as complaints_router
 from app.routes.health import router as health_router
+from app.routes.meta import router as meta_router
 from app.services.complaints import (
     ComplaintNotFoundError,
     ConcurrentUpdateError,
@@ -18,6 +19,7 @@ app = FastAPI(
 
 app.include_router(health_router)
 app.include_router(complaints_router)
+app.include_router(meta_router)
 
 
 @app.exception_handler(RequestValidationError)

@@ -6,6 +6,10 @@ on:
   push:
     branches: [dev]
 
+env:
+  TRIAGE_PROVIDER: simulated
+  SIMULATED_MODE: success
+
 permissions:
   contents: read
 
