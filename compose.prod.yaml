@@ -1,8 +1,8 @@
-# Development: application builds and backend source mount for hot reload.
-name: civicpulse
+# Standalone deployment file. Do not merge with development Compose.
+name: civicpulse-prod
 services:
   database:
-    image: postgres:16
+    image: ${POSTGRES_IMAGE:?Run scripts/Prepare-Production.ps1 first}
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in .env}
       POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in .env}
@@ -26,7 +26,7 @@ services:
           cpus: '1.0'
           memory: 512M
   cache:
-    image: redis:7-alpine
+    image: ${REDIS_IMAGE:?Run scripts/Prepare-Production.ps1 first}
     command:
     - redis-server
     - --appendonly
@@ -50,9 +50,8 @@ services:
           cpus: '0.5'
           memory: 256M
   backend:
-    image: civicpulse-backend:dev
-    build:
-      context: ./backend
+    image: ${BACKEND_IMAGE_REPOSITORY:-civicpulse-backend}:${IMAGE_TAG:?Set a sha-commit
+      image tag}
     environment:
       POSTGRES_HOST: database
       POSTGRES_PORT: '5432'
@@ -67,10 +66,6 @@ services:
       OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:1b}
       RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-10}
       RATE_LIMIT_WINDOW_SECONDS: ${RATE_LIMIT_WINDOW_SECONDS:-60}
-    ports:
-    - 127.0.0.1:8000:8000
-    volumes:
-    - ./backend:/app
     networks:
     - edge
     - internal
@@ -88,12 +83,12 @@ services:
     - 0.0.0.0
     - --port
     - '8000'
-    - --reload
     - --timeout-graceful-shutdown
     - '35'
     - --log-config
     - logging.json
     - --no-access-log
+    - --no-proxy-headers
     stop_grace_period: 45s
     restart: unless-stopped
     deploy:
@@ -101,6 +96,24 @@ services:
         limits:
           cpus: '1.0'
           memory: 512M
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    read_only: true
+    tmpfs:
+    - /tmp:rw,nosuid,nodev,size=64m,mode=1777
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',
+        timeout=2)
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 15s
   ollama:
     image: ollama/ollama:0.34.4
     profiles:
@@ -129,14 +142,10 @@ services:
           cpus: '2.0'
           memory: 4G
   frontend:
-    image: civicpulse-frontend:dev
-    build:
-      context: ./frontend
-      target: runtime
+    image: ${FRONTEND_IMAGE_REPOSITORY:-civicpulse-frontend}:${IMAGE_TAG:?Set a sha-commit
+      image tag}
     environment:
       BACKEND_UPSTREAM: backend:8000
-    ports:
-    - 127.0.0.1:8080:8080
     networks:
     - edge
     depends_on:
@@ -160,6 +169,15 @@ services:
         limits:
           cpus: '0.5'
           memory: 128M
+    security_opt:
+    - no-new-privileges:true
+    cap_drop:
+    - ALL
+    read_only: true
+    tmpfs:
+    - /tmp:rw,nosuid,nodev,size=64m,mode=1777
+    ports:
+    - 127.0.0.1:${FRONTEND_PORT:-8081}:8080
 networks:
   edge:
     driver: bridge
