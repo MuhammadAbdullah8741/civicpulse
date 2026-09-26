@@ -6,7 +6,11 @@ import { api } from '../src/api/client';
 import { ErrorBoundary } from '../src/components/ErrorBoundary';
 
 describe('frontend foundation', () => {
-  beforeEach(() => {vi.spyOn(api, 'list').mockResolvedValue({items:[],total:0,page:1,page_size:10});});
+  beforeEach(() => {
+    vi.spyOn(api, 'list').mockResolvedValue({items:[],total:0,page:1,page_size:10});
+    vi.spyOn(api, 'stats').mockResolvedValue({data:{total:0,by_category:{},by_priority:{},by_status:{}},cache:'MISS'});
+    vi.spyOn(api, 'providers').mockResolvedValue({active_provider:'simulated',cache_ttl_seconds:86400,triage_requests:0,cache_hits:0,cache_hit_rate:0,recent_outcomes:[]});
+  });
   it('opens the dashboard with accessible navigation', async () => {
     render(<App/>);
     await screen.findByText('No reports match these filters.');

@@ -1,4 +1,4 @@
-// Compare the complaint schemas against a running backend; ignores new endpoints.
+// Compare the consumed API schemas against a running backend; ignores new endpoints.
 import { readFile } from 'node:fs/promises';
 const url = process.env.OPENAPI_URL || 'http://127.0.0.1:8000/openapi.json';
 const expected = JSON.parse(await readFile(new URL('../openapi.json', import.meta.url), 'utf8'));
@@ -26,4 +26,4 @@ for (const [path, operations] of Object.entries(expected.paths)) {
     }
   }
 }
-console.log('Complaint API contract matches the running backend.');
+console.log('Frontend API contracts match the running backend.');
