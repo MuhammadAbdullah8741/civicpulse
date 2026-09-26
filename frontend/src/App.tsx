@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Submit } from './pages/Submit';
+import { Dashboard } from './pages/Dashboard';
 
 const views = {
   Dashboard: {title: 'The neighbourhood queue', description: 'Complaint filters, pagination and status actions will be added in the dashboard phase.'},
@@ -23,7 +24,7 @@ export default function App() {
         <button key={label} aria-current={page === label ? 'page' : undefined}
           className={page === label ? 'active' : ''} onClick={() => setPage(label)}>{label}</button>
       )}</nav>
-      {page === 'Submit report' ? <Submit/> : <section className="panel" aria-labelledby="view-title">
+      {page === 'Submit report' ? <Submit/> : page === 'Dashboard' ? <Dashboard/> : <section className="panel" aria-labelledby="view-title">
         <span className="eyebrow">FRONTEND FOUNDATION</span>
         <h2 id="view-title">{views[page].title}</h2>
         <p className="muted">{views[page].description}</p>
