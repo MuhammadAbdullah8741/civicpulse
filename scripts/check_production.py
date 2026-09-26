@@ -12,7 +12,9 @@ def check(condition, message):
 
 def main():
     result = subprocess.run(
-        ['docker', 'compose', '-f', 'compose.prod.yaml', 'config', '--format', 'json'],
+        # Inspect optional services too; config does not start or pull them.
+        ['docker', 'compose', '-f', 'compose.prod.yaml', '--profile', 'local-ai',
+         'config', '--format', 'json'],
         capture_output=True, text=True, check=False,
     )
     check(result.returncode == 0, 'Compose configuration failed. Check required environment variables.')
