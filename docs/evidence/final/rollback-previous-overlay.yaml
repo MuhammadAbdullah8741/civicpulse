@@ -1,0 +1,463 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: civicpulse
+---
+apiVersion: v1
+data:
+  BACKEND_UPSTREAM: backend.civicpulse.svc.cluster.local:8000
+  GROQ_MODEL: openai/gpt-oss-20b
+  POSTGRES_DB: civicpulse
+  POSTGRES_HOST: database
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: civicpulse
+  REDIS_URL: redis://cache:6379/0
+  SIMULATED_MODE: success
+  TRIAGE_PROVIDER: simulated
+  TRUSTED_PROXY_CIDRS: 10.42.0.0/16
+kind: ConfigMap
+metadata:
+  name: civicpulse-config
+  namespace: civicpulse
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: backend
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cache
+  namespace: civicpulse
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: cache
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: civicpulse
+spec:
+  clusterIP: None
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: database
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: civicpulse
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: frontend
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: civicpulse
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - command:
+        - python
+        - -m
+        - uvicorn
+        - app.main:app
+        - --host
+        - 0.0.0.0
+        - --port
+        - "8000"
+        - --timeout-graceful-shutdown
+        - "35"
+        - --log-config
+        - logging.json
+        - --no-access-log
+        - --no-proxy-headers
+        envFrom:
+        - configMapRef:
+            name: civicpulse-config
+        - secretRef:
+            name: civicpulse-secrets
+        image: civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - sleep 5
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          timeoutSeconds: 5
+        name: backend
+        ports:
+        - containerPort: 8000
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: 8000
+          periodSeconds: 5
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 163m
+            memory: 262144k
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 2
+          timeoutSeconds: 3
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 45
+      volumes:
+      - emptyDir:
+          sizeLimit: 64Mi
+        name: tmp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache
+  namespace: civicpulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cache
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - redis-server
+        - --appendonly
+        - "yes"
+        - --maxmemory
+        - 96mb
+        - --maxmemory-policy
+        - allkeys-lru
+        image: redis:7-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        name: redis
+        ports:
+        - containerPort: 6379
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 250m
+            memory: 192Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: redis-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: civicpulse
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: civicpulse-config
+        image: civicpulse-frontend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - sleep 5
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 5
+          timeoutSeconds: 3
+        name: frontend
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 5
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 32Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 2
+          timeoutSeconds: 3
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 45
+      volumes:
+      - emptyDir:
+          sizeLimit: 64Mi
+        name: tmp
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  namespace: civicpulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  serviceName: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        envFrom:
+        - configMapRef:
+            name: civicpulse-config
+        - secretRef:
+            name: civicpulse-secrets
+        image: postgres:16@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+        name: postgres
+        ports:
+        - containerPort: 5432
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        startupProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+          failureThreshold: 60
+          periodSeconds: 2
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: backend
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+    scaleUp:
+      stabilizationWindowSeconds: 0
+  maxReplicas: 10
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 60
+        type: Utilization
+    type: Resource
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: civicpulse
+  namespace: civicpulse
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: civicpulse.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: backend
+            port:
+              number: 8000
+        path: /api
+        pathType: Prefix
+      - backend:
+          service:
+            name: frontend
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix

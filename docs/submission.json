@@ -1,0 +1,34 @@
+{
+  "repository_url": "https://github.com/MuhammadAbdullah8741/civicpulse",
+  "backend_package_url": "https://github.com/users/MuhammadAbdullah8741/packages/container/package/civicpulse-backend",
+  "frontend_package_url": "https://github.com/users/MuhammadAbdullah8741/packages/container/package/civicpulse-frontend",
+  "cd_run_url": "",
+  "release_url": "",
+  "demo_video_url": "",
+  "demo_duration_seconds": 0,
+  "both_partners_speak": false,
+  "credentials_rotated": false,
+  "partner_git_authors": [
+    [
+      "umarsidiqui04"
+    ],
+    [
+      "M Abdullah",
+      "M.Abdullah",
+      "Muhammad Abdullah"
+    ]
+  ],
+  "reviewed_issue_pr_urls": [],
+  "evidence": {
+    "branch_protection": "docs/evidence/final/branch-protection.png",
+    "blocked_ci": "docs/evidence/final/blocked-ci.png",
+    "fixed_ci": "docs/evidence/final/fixed-ci.png",
+    "merge_conflict": "docs/evidence/final/merge-conflict.png",
+    "merge_resolution": "docs/evidence/final/merge-resolution.png",
+    "frontend_submit": "docs/evidence/final/frontend-submit.png",
+    "frontend_dashboard": "docs/evidence/final/frontend-dashboard.png",
+    "frontend_stats": "docs/evidence/final/frontend-stats.png",
+    "network_isolation": "docs/evidence/final/network-isolation.txt",
+    "rollback": "docs/evidence/final/rollback.txt"
+  }
+}

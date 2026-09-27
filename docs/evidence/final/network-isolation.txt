@@ -1,0 +1,6 @@
+﻿PASS: frontend network namespace could not reach PostgreSQL.
+PASS: backend connected to PostgreSQL.
+Database address tested: 172.22.0.2
+Backend image: civicpulse-backend:sha-66563b1803475d8d17a80b5625774770457b3d53
+Commit: 1113f298ec4c6fe8ed5e64a7e9c15d11bf9d3565
+Recorded: 2026-09-27T22:16:26.2234994+05:00

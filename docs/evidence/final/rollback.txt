@@ -1,0 +1,1139 @@
+$ git status --porcelain
+
+$ git rev-parse HEAD
+bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1
+
+$ kubectl --context k3d-civicpulse -n civicpulse get deployment backend -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "6",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"backend\",\"namespace\":\"civicpulse\"},\"spec\":{\"replicas\":2,\"selector\":{\"matchLabels\":{\"app\":\"backend\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"backend\"}},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"command\":[\"python\",\"-m\",\"uvicorn\",\"app.main:app\",\"--host\",\"0.0.0.0\",\"--port\",\"8000\",\"--timeout-graceful-shutdown\",\"35\",\"--log-config\",\"logging.json\",\"--no-access-log\",\"--no-proxy-headers\"],\"envFrom\":[{\"configMapRef\":{\"name\":\"civicpulse-config\"}},{\"secretRef\":{\"name\":\"civicpulse-secrets\"}}],\"image\":\"civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1\",\"imagePullPolicy\":\"IfNotPresent\",\"lifecycle\":{\"preStop\":{\"exec\":{\"command\":[\"/bin/sh\",\"-c\",\"sleep 5\"]}}},\"livenessProbe\":{\"failureThreshold\":6,\"httpGet\":{\"path\":\"/health\",\"port\":8000},\"periodSeconds\":10,\"timeoutSeconds\":5},\"name\":\"backend\",\"ports\":[{\"containerPort\":8000,\"name\":\"http\"}],\"readinessProbe\":{\"failureThreshold\":3,\"httpGet\":{\"path\":\"/ready\",\"port\":8000},\"periodSeconds\":5,\"timeoutSeconds\":3},\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"256Mi\"},\"requests\":{\"cpu\":\"163m\",\"memory\":\"262144k\"}},\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"ALL\"]},\"readOnlyRootFilesystem\":true,\"runAsGroup\":10001,\"runAsNonRoot\":true,\"runAsUser\":10001},\"startupProbe\":{\"failureThreshold\":30,\"httpGet\":{\"path\":\"/health\",\"port\":8000},\"periodSeconds\":2,\"timeoutSeconds\":3},\"volumeMounts\":[{\"mountPath\":\"/tmp\",\"name\":\"tmp\"}]}],\"securityContext\":{\"seccompProfile\":{\"type\":\"RuntimeDefault\"}},\"terminationGracePeriodSeconds\":45,\"volumes\":[{\"emptyDir\":{\"sizeLimit\":\"64Mi\"},\"name\":\"tmp\"}]}}}}\n"
+        },
+        "creationTimestamp": "2026-09-27T07:25:19Z",
+        "generation": 21,
+        "name": "backend",
+        "namespace": "civicpulse",
+        "resourceVersion": "10038",
+        "uid": "129e8976-e17f-49f3-9e00-6414a8317a8f"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 2,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "backend"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "backend"
+                }
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "python",
+                            "-m",
+                            "uvicorn",
+                            "app.main:app",
+                            "--host",
+                            "0.0.0.0",
+                            "--port",
+                            "8000",
+                            "--timeout-graceful-shutdown",
+                            "35",
+                            "--log-config",
+                            "logging.json",
+                            "--no-access-log",
+                            "--no-proxy-headers"
+                        ],
+                        "envFrom": [
+                            {
+                                "configMapRef": {
+                                    "name": "civicpulse-config"
+                                }
+                            },
+                            {
+                                "secretRef": {
+                                    "name": "civicpulse-secrets"
+                                }
+                            }
+                        ],
+                        "image": "civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1",
+                        "imagePullPolicy": "IfNotPresent",
+                        "lifecycle": {
+                            "preStop": {
+                                "exec": {
+                                    "command": [
+                                        "/bin/sh",
+                                        "-c",
+                                        "sleep 5"
+                                    ]
+                                }
+                            }
+                        },
+                        "livenessProbe": {
+                            "failureThreshold": 6,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8000,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "name": "backend",
+                        "ports": [
+                            {
+                                "containerPort": 8000,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/ready",
+                                "port": 8000,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "163m",
+                                "memory": "262144k"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true,
+                            "runAsGroup": 10001,
+                            "runAsNonRoot": true,
+                            "runAsUser": 10001
+                        },
+                        "startupProbe": {
+                            "failureThreshold": 30,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8000,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "terminationGracePeriodSeconds": 45,
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "64Mi"
+                        },
+                        "name": "tmp"
+                    }
+                ]
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 2,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-09-27T16:43:48Z",
+                "lastUpdateTime": "2026-09-27T16:43:48Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-09-27T07:25:19Z",
+                "lastUpdateTime": "2026-09-27T17:18:46Z",
+                "message": "ReplicaSet \"backend-84949c55d9\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 21,
+        "readyReplicas": 2,
+        "replicas": 2,
+        "terminatingReplicas": 1,
+        "updatedReplicas": 2
+    }
+}
+
+$ kubectl --context k3d-civicpulse -n civicpulse get deployment frontend -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "3",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"frontend\",\"namespace\":\"civicpulse\"},\"spec\":{\"replicas\":2,\"selector\":{\"matchLabels\":{\"app\":\"frontend\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"frontend\"}},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"envFrom\":[{\"configMapRef\":{\"name\":\"civicpulse-config\"}}],\"image\":\"civicpulse-frontend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1\",\"imagePullPolicy\":\"IfNotPresent\",\"lifecycle\":{\"preStop\":{\"exec\":{\"command\":[\"/bin/sh\",\"-c\",\"sleep 5\"]}}},\"livenessProbe\":{\"failureThreshold\":3,\"httpGet\":{\"path\":\"/health\",\"port\":8080},\"periodSeconds\":5,\"timeoutSeconds\":3},\"name\":\"frontend\",\"ports\":[{\"containerPort\":8080,\"name\":\"http\"}],\"readinessProbe\":{\"failureThreshold\":3,\"httpGet\":{\"path\":\"/health\",\"port\":8080},\"periodSeconds\":5,\"timeoutSeconds\":3},\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"128Mi\"},\"requests\":{\"cpu\":\"50m\",\"memory\":\"32Mi\"}},\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"ALL\"]},\"readOnlyRootFilesystem\":true,\"runAsGroup\":101,\"runAsNonRoot\":true,\"runAsUser\":101},\"startupProbe\":{\"failureThreshold\":30,\"httpGet\":{\"path\":\"/health\",\"port\":8080},\"periodSeconds\":2,\"timeoutSeconds\":3},\"volumeMounts\":[{\"mountPath\":\"/tmp\",\"name\":\"tmp\"}]}],\"securityContext\":{\"seccompProfile\":{\"type\":\"RuntimeDefault\"}},\"terminationGracePeriodSeconds\":45,\"volumes\":[{\"emptyDir\":{\"sizeLimit\":\"64Mi\"},\"name\":\"tmp\"}]}}}}\n"
+        },
+        "creationTimestamp": "2026-09-27T07:25:19Z",
+        "generation": 3,
+        "name": "frontend",
+        "namespace": "civicpulse",
+        "resourceVersion": "10046",
+        "uid": "93dcfe93-8997-4380-b382-223abb428a0b"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 2,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "frontend"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "frontend"
+                }
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "envFrom": [
+                            {
+                                "configMapRef": {
+                                    "name": "civicpulse-config"
+                                }
+                            }
+                        ],
+                        "image": "civicpulse-frontend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1",
+                        "imagePullPolicy": "IfNotPresent",
+                        "lifecycle": {
+                            "preStop": {
+                                "exec": {
+                                    "command": [
+                                        "/bin/sh",
+                                        "-c",
+                                        "sleep 5"
+                                    ]
+                                }
+                            }
+                        },
+                        "livenessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8080,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "name": "frontend",
+                        "ports": [
+                            {
+                                "containerPort": 8080,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8080,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "128Mi"
+                            },
+                            "requests": {
+                                "cpu": "50m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true,
+                            "runAsGroup": 101,
+                            "runAsNonRoot": true,
+                            "runAsUser": 101
+                        },
+                        "startupProbe": {
+                            "failureThreshold": 30,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8080,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "terminationGracePeriodSeconds": 45,
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "64Mi"
+                        },
+                        "name": "tmp"
+                    }
+                ]
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 2,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-09-27T16:43:17Z",
+                "lastUpdateTime": "2026-09-27T16:43:17Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-09-27T07:25:19Z",
+                "lastUpdateTime": "2026-09-27T17:18:43Z",
+                "message": "ReplicaSet \"frontend-65688df5d8\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 3,
+        "readyReplicas": 2,
+        "replicas": 2,
+        "terminatingReplicas": 0,
+        "updatedReplicas": 2
+    }
+}
+
+$ kubectl kustomize k8s/overlays/dev
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: civicpulse
+---
+apiVersion: v1
+data:
+  BACKEND_UPSTREAM: backend.civicpulse.svc.cluster.local:8000
+  GROQ_MODEL: openai/gpt-oss-20b
+  POSTGRES_DB: civicpulse
+  POSTGRES_HOST: database
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: civicpulse
+  REDIS_URL: redis://cache:6379/0
+  SIMULATED_MODE: success
+  TRIAGE_PROVIDER: simulated
+  TRUSTED_PROXY_CIDRS: 10.42.0.0/16
+kind: ConfigMap
+metadata:
+  name: civicpulse-config
+  namespace: civicpulse
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: backend
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cache
+  namespace: civicpulse
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: cache
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: civicpulse
+spec:
+  clusterIP: None
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: database
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: civicpulse
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: frontend
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: civicpulse
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - command:
+        - python
+        - -m
+        - uvicorn
+        - app.main:app
+        - --host
+        - 0.0.0.0
+        - --port
+        - "8000"
+        - --timeout-graceful-shutdown
+        - "35"
+        - --log-config
+        - logging.json
+        - --no-access-log
+        - --no-proxy-headers
+        envFrom:
+        - configMapRef:
+            name: civicpulse-config
+        - secretRef:
+            name: civicpulse-secrets
+        image: civicpulse-backend:dev
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - sleep 5
+        livenessProbe:
+          failureThreshold: 6
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          timeoutSeconds: 5
+        name: backend
+        ports:
+        - containerPort: 8000
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: 8000
+          periodSeconds: 5
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 256Mi
+          requests:
+            cpu: 163m
+            memory: 262144k
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 2
+          timeoutSeconds: 3
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 45
+      volumes:
+      - emptyDir:
+          sizeLimit: 64Mi
+        name: tmp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cache
+  namespace: civicpulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cache
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - redis-server
+        - --appendonly
+        - "yes"
+        - --maxmemory
+        - 96mb
+        - --maxmemory-policy
+        - allkeys-lru
+        image: redis:7-alpine@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        name: redis
+        ports:
+        - containerPort: 6379
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 250m
+            memory: 192Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: redis-data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: civicpulse
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - envFrom:
+        - configMapRef:
+            name: civicpulse-config
+        image: civicpulse-frontend:dev
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - sleep 5
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 5
+          timeoutSeconds: 3
+        name: frontend
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 5
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 32Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsNonRoot: true
+          runAsUser: 101
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /health
+            port: 8080
+          periodSeconds: 2
+          timeoutSeconds: 3
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 45
+      volumes:
+      - emptyDir:
+          sizeLimit: 64Mi
+        name: tmp
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: database
+  namespace: civicpulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  serviceName: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        envFrom:
+        - configMapRef:
+            name: civicpulse-config
+        - secretRef:
+            name: civicpulse-secrets
+        image: postgres:16@sha256:1a6ab3f5345eb6dbe04a1349529caabdb0ab09293a09590fad07b2246bfa4b54
+        name: postgres
+        ports:
+        - containerPort: 5432
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+          periodSeconds: 5
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        startupProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+          failureThreshold: 60
+          periodSeconds: 2
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: backend
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend
+  namespace: civicpulse
+spec:
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+    scaleUp:
+      stabilizationWindowSeconds: 0
+  maxReplicas: 10
+  metrics:
+  - resource:
+      name: cpu
+      target:
+        averageUtilization: 60
+        type: Utilization
+    type: Resource
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: civicpulse
+  namespace: civicpulse
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: civicpulse.localhost
+    http:
+      paths:
+      - backend:
+          service:
+            name: backend
+            port:
+              number: 8000
+        path: /api
+        pathType: Prefix
+      - backend:
+          service:
+            name: frontend
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+
+$ docker tag civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1 civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1-rollback-demo
+
+$ k3d image import civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1-rollback-demo -c civicpulse
+[36mINFO[0m[0000] Importing image(s) into cluster 'civicpulse' 
+[36mINFO[0m[0000] Starting new tools node...                   
+[36mINFO[0m[0000] Starting node 'k3d-civicpulse-tools'         
+[36mINFO[0m[0001] Saving 1 image(s) from runtime...            
+[36mINFO[0m[0005] Importing images into nodes...               
+[36mINFO[0m[0005] Importing images from tarball '/k3d/images/k3d-civicpulse-images-20260927221853.tar' into node 'k3d-civicpulse-agent-0'... 
+[36mINFO[0m[0005] Importing images from tarball '/k3d/images/k3d-civicpulse-images-20260927221853.tar' into node 'k3d-civicpulse-server-0'... 
+[36mINFO[0m[0007] Removing the tarball(s) from image volume... 
+[36mINFO[0m[0008] Removing k3d-tools node...                   
+[36mINFO[0m[0008] Successfully imported image(s)               
+[36mINFO[0m[0008] Successfully imported 1 image(s) into 1 cluster(s) 
+
+$ kubectl --context k3d-civicpulse -n civicpulse set image deployment/backend backend=civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1-rollback-demo
+deployment.apps/backend image updated
+
+$ kubectl --context k3d-civicpulse -n civicpulse rollout status deployment/backend --timeout=240s
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+deployment "backend" successfully rolled out
+
+$ kubectl --context k3d-civicpulse -n civicpulse rollout undo deployment/backend
+deployment.apps/backend rolled back
+
+$ kubectl --context k3d-civicpulse -n civicpulse rollout status deployment/backend --timeout=240s
+Waiting for deployment "backend" rollout to finish: 0 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+deployment "backend" successfully rolled out
+
+$ kubectl --context k3d-civicpulse -n civicpulse set image deployment/backend backend=civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1-rollback-demo
+deployment.apps/backend image updated
+
+$ kubectl --context k3d-civicpulse -n civicpulse rollout status deployment/backend --timeout=240s
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+deployment "backend" successfully rolled out
+
+$ kubectl --context k3d-civicpulse -n civicpulse apply -f C:\Users\hp\Projects\civicpulse\docs\evidence\final\rollback-previous-overlay.yaml
+namespace/civicpulse unchanged
+configmap/civicpulse-config unchanged
+service/backend unchanged
+service/cache unchanged
+service/database unchanged
+service/frontend unchanged
+persistentvolumeclaim/redis-data unchanged
+deployment.apps/backend configured
+deployment.apps/cache unchanged
+deployment.apps/frontend unchanged
+statefulset.apps/database configured
+poddisruptionbudget.policy/backend configured
+horizontalpodautoscaler.autoscaling/backend unchanged
+ingress.networking.k8s.io/civicpulse unchanged
+
+$ kubectl --context k3d-civicpulse -n civicpulse rollout status deployment/backend --timeout=240s
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "backend" rollout to finish: 1 old replicas are pending termination...
+deployment "backend" successfully rolled out
+
+$ kubectl --context k3d-civicpulse -n civicpulse get deployment backend -o json
+{
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+        "annotations": {
+            "deployment.kubernetes.io/revision": "10",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"apps/v1\",\"kind\":\"Deployment\",\"metadata\":{\"annotations\":{},\"name\":\"backend\",\"namespace\":\"civicpulse\"},\"spec\":{\"replicas\":2,\"selector\":{\"matchLabels\":{\"app\":\"backend\"}},\"strategy\":{\"rollingUpdate\":{\"maxSurge\":1,\"maxUnavailable\":0},\"type\":\"RollingUpdate\"},\"template\":{\"metadata\":{\"labels\":{\"app\":\"backend\"}},\"spec\":{\"automountServiceAccountToken\":false,\"containers\":[{\"command\":[\"python\",\"-m\",\"uvicorn\",\"app.main:app\",\"--host\",\"0.0.0.0\",\"--port\",\"8000\",\"--timeout-graceful-shutdown\",\"35\",\"--log-config\",\"logging.json\",\"--no-access-log\",\"--no-proxy-headers\"],\"envFrom\":[{\"configMapRef\":{\"name\":\"civicpulse-config\"}},{\"secretRef\":{\"name\":\"civicpulse-secrets\"}}],\"image\":\"civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1\",\"imagePullPolicy\":\"IfNotPresent\",\"lifecycle\":{\"preStop\":{\"exec\":{\"command\":[\"/bin/sh\",\"-c\",\"sleep 5\"]}}},\"livenessProbe\":{\"failureThreshold\":6,\"httpGet\":{\"path\":\"/health\",\"port\":8000},\"periodSeconds\":10,\"timeoutSeconds\":5},\"name\":\"backend\",\"ports\":[{\"containerPort\":8000,\"name\":\"http\"}],\"readinessProbe\":{\"failureThreshold\":3,\"httpGet\":{\"path\":\"/ready\",\"port\":8000},\"periodSeconds\":5,\"timeoutSeconds\":3},\"resources\":{\"limits\":{\"cpu\":\"500m\",\"memory\":\"256Mi\"},\"requests\":{\"cpu\":\"163m\",\"memory\":\"262144k\"}},\"securityContext\":{\"allowPrivilegeEscalation\":false,\"capabilities\":{\"drop\":[\"ALL\"]},\"readOnlyRootFilesystem\":true,\"runAsGroup\":10001,\"runAsNonRoot\":true,\"runAsUser\":10001},\"startupProbe\":{\"failureThreshold\":30,\"httpGet\":{\"path\":\"/health\",\"port\":8000},\"periodSeconds\":2,\"timeoutSeconds\":3},\"volumeMounts\":[{\"mountPath\":\"/tmp\",\"name\":\"tmp\"}]}],\"securityContext\":{\"seccompProfile\":{\"type\":\"RuntimeDefault\"}},\"terminationGracePeriodSeconds\":45,\"volumes\":[{\"emptyDir\":{\"sizeLimit\":\"64Mi\"},\"name\":\"tmp\"}]}}}}\n"
+        },
+        "creationTimestamp": "2026-09-27T07:25:19Z",
+        "generation": 25,
+        "name": "backend",
+        "namespace": "civicpulse",
+        "resourceVersion": "10440",
+        "uid": "129e8976-e17f-49f3-9e00-6414a8317a8f"
+    },
+    "spec": {
+        "progressDeadlineSeconds": 600,
+        "replicas": 2,
+        "revisionHistoryLimit": 10,
+        "selector": {
+            "matchLabels": {
+                "app": "backend"
+            }
+        },
+        "strategy": {
+            "rollingUpdate": {
+                "maxSurge": 1,
+                "maxUnavailable": 0
+            },
+            "type": "RollingUpdate"
+        },
+        "template": {
+            "metadata": {
+                "labels": {
+                    "app": "backend"
+                }
+            },
+            "spec": {
+                "automountServiceAccountToken": false,
+                "containers": [
+                    {
+                        "command": [
+                            "python",
+                            "-m",
+                            "uvicorn",
+                            "app.main:app",
+                            "--host",
+                            "0.0.0.0",
+                            "--port",
+                            "8000",
+                            "--timeout-graceful-shutdown",
+                            "35",
+                            "--log-config",
+                            "logging.json",
+                            "--no-access-log",
+                            "--no-proxy-headers"
+                        ],
+                        "envFrom": [
+                            {
+                                "configMapRef": {
+                                    "name": "civicpulse-config"
+                                }
+                            },
+                            {
+                                "secretRef": {
+                                    "name": "civicpulse-secrets"
+                                }
+                            }
+                        ],
+                        "image": "civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1",
+                        "imagePullPolicy": "IfNotPresent",
+                        "lifecycle": {
+                            "preStop": {
+                                "exec": {
+                                    "command": [
+                                        "/bin/sh",
+                                        "-c",
+                                        "sleep 5"
+                                    ]
+                                }
+                            }
+                        },
+                        "livenessProbe": {
+                            "failureThreshold": 6,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8000,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 10,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 5
+                        },
+                        "name": "backend",
+                        "ports": [
+                            {
+                                "containerPort": 8000,
+                                "name": "http",
+                                "protocol": "TCP"
+                            }
+                        ],
+                        "readinessProbe": {
+                            "failureThreshold": 3,
+                            "httpGet": {
+                                "path": "/ready",
+                                "port": 8000,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 5,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "resources": {
+                            "limits": {
+                                "cpu": "500m",
+                                "memory": "256Mi"
+                            },
+                            "requests": {
+                                "cpu": "163m",
+                                "memory": "262144k"
+                            }
+                        },
+                        "securityContext": {
+                            "allowPrivilegeEscalation": false,
+                            "capabilities": {
+                                "drop": [
+                                    "ALL"
+                                ]
+                            },
+                            "readOnlyRootFilesystem": true,
+                            "runAsGroup": 10001,
+                            "runAsNonRoot": true,
+                            "runAsUser": 10001
+                        },
+                        "startupProbe": {
+                            "failureThreshold": 30,
+                            "httpGet": {
+                                "path": "/health",
+                                "port": 8000,
+                                "scheme": "HTTP"
+                            },
+                            "periodSeconds": 2,
+                            "successThreshold": 1,
+                            "timeoutSeconds": 3
+                        },
+                        "terminationMessagePath": "/dev/termination-log",
+                        "terminationMessagePolicy": "File",
+                        "volumeMounts": [
+                            {
+                                "mountPath": "/tmp",
+                                "name": "tmp"
+                            }
+                        ]
+                    }
+                ],
+                "dnsPolicy": "ClusterFirst",
+                "restartPolicy": "Always",
+                "schedulerName": "default-scheduler",
+                "securityContext": {
+                    "seccompProfile": {
+                        "type": "RuntimeDefault"
+                    }
+                },
+                "terminationGracePeriodSeconds": 45,
+                "volumes": [
+                    {
+                        "emptyDir": {
+                            "sizeLimit": "64Mi"
+                        },
+                        "name": "tmp"
+                    }
+                ]
+            }
+        }
+    },
+    "status": {
+        "availableReplicas": 2,
+        "conditions": [
+            {
+                "lastTransitionTime": "2026-09-27T16:43:48Z",
+                "lastUpdateTime": "2026-09-27T16:43:48Z",
+                "message": "Deployment has minimum availability.",
+                "reason": "MinimumReplicasAvailable",
+                "status": "True",
+                "type": "Available"
+            },
+            {
+                "lastTransitionTime": "2026-09-27T07:25:19Z",
+                "lastUpdateTime": "2026-09-27T17:19:39Z",
+                "message": "ReplicaSet \"backend-84949c55d9\" has successfully progressed.",
+                "reason": "NewReplicaSetAvailable",
+                "status": "True",
+                "type": "Progressing"
+            }
+        ],
+        "observedGeneration": 25,
+        "readyReplicas": 2,
+        "replicas": 2,
+        "terminatingReplicas": 2,
+        "updatedReplicas": 2
+    }
+}
+
+PASS: imperative undo and declarative previous-overlay application restored the recorded image.
