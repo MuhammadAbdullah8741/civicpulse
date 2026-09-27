@@ -7,6 +7,8 @@ COPY src ./src
 RUN npm run build
 
 FROM nginx:1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10 AS runtime
+# Apply security updates available for this pinned base image's Alpine branch.
+RUN apk upgrade --no-cache
 ENV BACKEND_UPSTREAM=backend:8000
 COPY nginx.conf /etc/nginx/civicpulse.conf.template
 COPY docker-entrypoint.sh /usr/local/bin/civicpulse-entrypoint
