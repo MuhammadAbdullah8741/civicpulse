@@ -11,3 +11,6 @@ resources:
 - cache.yaml
 - ingress.yaml
 - scaling.yaml
+patches:
+- path: backend-vpa-requests.yaml
+- path: backend-probes.yaml
