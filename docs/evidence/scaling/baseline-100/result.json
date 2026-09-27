@@ -1,0 +1,13 @@
+{
+  "load_exit_code": 99,
+  "requests": 17304,
+  "failed_request_rate": 0,
+  "dropped_iterations": 847,
+  "p95_ms": 2514.3734239499945,
+  "peak_replicas": 10,
+  "scale_out_observed": true,
+  "first_scale_out_seconds": 53.9,
+  "first_extra_ready_seconds": 59.4,
+  "rollout_exit_code": null,
+  "timing_note": "Schedule relative to docker launch; container startup introduces a small offset. Sampling interval is ~5s plus API latency."
+}

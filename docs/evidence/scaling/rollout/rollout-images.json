@@ -1,0 +1,5 @@
+{
+  "old": "civicpulse-backend:89d582e3ff975a8da107ab2f42caef9f72db2ffd",
+  "new": "civicpulse-backend:89d582e3ff975a8da107ab2f42caef9f72db2ffd-rollout",
+  "note": "Same application bytes under a new tag; exercises an image-triggered rolling update."
+}

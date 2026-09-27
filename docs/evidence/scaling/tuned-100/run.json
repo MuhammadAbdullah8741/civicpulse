@@ -1,0 +1,14 @@
+{
+  "utc": "2026-09-27T11:35:51.812102+00:00",
+  "git_commit": "41886ed2c76e689e39623968b71163c7441e7673",
+  "mode": "scaling",
+  "rate": 100,
+  "load_path": "/api/complaints?page=1&page_size=100",
+  "k6_image": "grafana/k6:0.57.0",
+  "initial": {
+    "replicas": 2,
+    "ready": 2,
+    "desired": 2,
+    "cpu_percent": 2
+  }
+}
