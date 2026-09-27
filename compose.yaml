@@ -54,6 +54,7 @@ services:
     build:
       context: ./backend
     environment:
+      TRUSTED_PROXY_HOSTS: frontend
       POSTGRES_HOST: database
       POSTGRES_PORT: '5432'
       POSTGRES_DB: ${POSTGRES_DB}
@@ -94,6 +95,7 @@ services:
     - --log-config
     - logging.json
     - --no-access-log
+    - --no-proxy-headers
     stop_grace_period: 45s
     restart: unless-stopped
     deploy:

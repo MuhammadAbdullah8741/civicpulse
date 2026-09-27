@@ -53,6 +53,7 @@ services:
     image: ${BACKEND_IMAGE_REPOSITORY:-civicpulse-backend}:${IMAGE_TAG:?Set a sha-commit
       image tag}
     environment:
+      TRUSTED_PROXY_HOSTS: frontend
       POSTGRES_HOST: database
       POSTGRES_PORT: '5432'
       POSTGRES_DB: ${POSTGRES_DB}

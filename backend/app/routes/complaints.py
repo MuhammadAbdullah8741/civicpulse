@@ -15,6 +15,7 @@ from app.schemas import (
     StatusUpdate,
 )
 from app.services import complaints as service
+from app.services.client_ip import client_ip
 from app.services.rate_limit import check
 
 router = APIRouter(prefix="/api/complaints", tags=["complaints"])
@@ -30,7 +31,7 @@ def create_complaint(
     request: Request,
     provider: Annotated[TriageProvider, Depends(get_triage_provider)],
 ) -> ComplaintResponse:
-    check(request.client.host if request.client else "unknown")
+    check(client_ip(request))
     return service.create(payload, provider)
 
 
