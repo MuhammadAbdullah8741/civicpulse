@@ -1,8 +1,6 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  # Dedicated local k3s cluster: only trusted workloads may use this pod CIDR.
-  TRUSTED_PROXY_CIDRS: 10.42.0.0/16
   name: civicpulse-config
   namespace: civicpulse
 data:
@@ -15,3 +13,5 @@ data:
   SIMULATED_MODE: success
   GROQ_MODEL: openai/gpt-oss-20b
   BACKEND_UPSTREAM: backend.civicpulse.svc.cluster.local:8000
+  # Dedicated local k3s cluster with trusted workloads only.
+  TRUSTED_PROXY_CIDRS: '10.42.0.0/16'
