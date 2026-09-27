@@ -47,3 +47,27 @@ shutdown configuration and associated tests. The user requested complete file
 packages and performs all application execution and GitHub operations themselves.
 Only syntax/package inspection was performed by the assistant for this phase.
 Record actual test/CI results after running the package; no pass is claimed here.
+
+## Frontend, infrastructure and final delivery assistance
+
+ChatGPT/Codex also supplied React submit/dashboard/stats files and tests,
+frontend container/runtime configuration, CI security checks, production Compose,
+Kubernetes/Kustomize manifests, local deployment and scaling scripts, delivery
+workflows, SBOM generation, final documentation and the submission checker.
+The students execute commands, review behavior, collect real evidence and
+perform commits and partner reviews. Commit authorship alone does not imply
+independent authorship of generated code.
+
+The final audit found that proxy socket addresses were used directly for rate
+limiting. The Phase 12 patch adds explicit trusted-proxy resolution, rejects
+untrusted forwarding headers and tests client separation. It documents the
+single-trusted-cluster assumption instead of claiming multi-tenant security.
+
+Verification already shown by the students includes 95 backend tests with
+93.03% coverage before Phase 12, a successful Kubernetes Ingress smoke check,
+recorded failed baseline/tuned load thresholds, and a successful 5401-request
+rolling update with zero failed requests and zero dropped iterations. Phase 11
+local output showed 14 helper tests and actionlint passing. The Phase 12
+assistant-side run passed 76 backend tests and skipped 26 requiring services;
+Ruff and mypy passed. Full database integration and remote CD/release validation
+remain student-run gates. Record their actual results before submission.
