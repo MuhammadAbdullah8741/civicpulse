@@ -55,6 +55,7 @@ K -n civicpulse rollout status deployment/backend --timeout=300s
 K -n civicpulse rollout status deployment/frontend --timeout=180s
 K -n kube-system rollout status deployment/traefik --timeout=180s
 K -n kube-system rollout status deployment/metrics-server --timeout=180s
-K -n civicpulse get deployments,statefulsets,services,ingress,pvc,hpa,pdb
+K -n civicpulse get "deployments,statefulsets,services,ingress,pvc,hpa,pdb"
 Write-Host 'Deployment finished. Open http://civicpulse.localhost:8082'
 Write-Host 'Run the smoke check and capture evidence before marking the issue complete.'
+
