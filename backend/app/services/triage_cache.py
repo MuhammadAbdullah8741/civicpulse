@@ -4,12 +4,12 @@ import json
 import os
 from datetime import UTC, datetime
 from time import perf_counter
-from typing import Any
+from typing import Any, cast
 
 from redis.exceptions import RedisError
 
-from app.providers.cache import get_cache
 from app.observability import TRIAGE_LATENCY, metric_provider
+from app.providers.cache import get_cache
 from app.providers.triage.base import TriageProvider, TriageResult
 from app.services.triage import triage_with_fallback
 
@@ -67,7 +67,8 @@ def triage_with_cache(
     key = cache_key(provider, text, location)
     result = None
     try:
-        raw = get_cache().get(key)
+        # decode_responses=True on the synchronous Redis client returns text.
+        raw = cast(str | None, get_cache().get(key))
         if raw is not None:
             try:
                 result = TriageResult.model_validate_json(raw)

@@ -1,7 +1,6 @@
 from app.repositories.database import get_engine
 from app.repositories.seed import seed_complaints
 
-
 GROUPS = [
     ("water", [
         ("high", "Burst water pipe since fajr; water is entering houses.", "Street 12, G-9 Islamabad"),

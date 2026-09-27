@@ -5,7 +5,6 @@ from time import sleep
 import httpx
 
 from app.observability import FALLBACKS
-
 from app.providers.triage.base import TriageProvider, TriageResult
 from app.providers.triage.rules import RuleBasedTriage
 
@@ -30,9 +29,9 @@ def triage_with_fallback(
     for attempt in range(2):
         try:
             result = provider.triage(text, location)
-            if isinstance(result, TriageResult):
-                result = result.model_dump()
-            return TriageResult.model_validate(result), provider.name
+            # Revalidate model fields as well as malformed third-party responses.
+            raw: object = result.model_dump() if isinstance(result, TriageResult) else result
+            return TriageResult.model_validate(raw), provider.name
         except Exception as error:
             if attempt == 0 and retryable(error):
                 sleep(uniform(0.1, 0.3))

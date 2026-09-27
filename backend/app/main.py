@@ -1,35 +1,36 @@
 import logging
 import re
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from time import perf_counter
 from uuid import uuid4
 
+from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from redis.exceptions import RedisError
 from sqlalchemy.exc import SQLAlchemyError
+from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import Response
 
 from app.observability import LATENCY, REQUESTS, request_id
 from app.providers.cache import close_cache
 from app.repositories.database import close_database
-from app.routes.stats import router as stats_router
-from app.services.rate_limit import RateLimitExceeded
-
-from fastapi import FastAPI, Request
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-
 from app.routes.complaints import router as complaints_router
 from app.routes.health import router as health_router
 from app.routes.meta import router as meta_router
+from app.routes.stats import router as stats_router
 from app.services.complaints import (
     ComplaintNotFoundError,
     ConcurrentUpdateError,
 )
+from app.services.rate_limit import RateLimitExceeded
 from app.services.status import InvalidTransitionError
 
+
 @asynccontextmanager
-async def lifespan(app):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # Uvicorn drains requests before triggering lifespan shutdown.
     try:
         yield
@@ -57,7 +58,7 @@ app.include_router(stats_router)
 @app.exception_handler(RequestValidationError)
 async def validation_error(
     request: Request, exc: RequestValidationError
-):
+) -> JSONResponse:
     return JSONResponse(
         status_code=400,
         content={
@@ -75,22 +76,22 @@ async def validation_error(
 
 
 @app.exception_handler(ComplaintNotFoundError)
-async def not_found(request: Request, exc: ComplaintNotFoundError):
+async def not_found(request: Request, exc: ComplaintNotFoundError) -> JSONResponse:
     return JSONResponse(status_code=404, content={"detail": str(exc)})
 
 
 @app.exception_handler(InvalidTransitionError)
-async def invalid_transition(request: Request, exc: InvalidTransitionError):
+async def invalid_transition(request: Request, exc: InvalidTransitionError) -> JSONResponse:
     return JSONResponse(status_code=409, content={"detail": str(exc)})
 
 
 @app.exception_handler(ConcurrentUpdateError)
-async def concurrent_update(request: Request, exc: ConcurrentUpdateError):
+async def concurrent_update(request: Request, exc: ConcurrentUpdateError) -> JSONResponse:
     return JSONResponse(status_code=409, content={"detail": str(exc)})
 
 
 @app.middleware("http")
-async def observe_request(request: Request, call_next):
+async def observe_request(request: Request, call_next: RequestResponseEndpoint) -> Response:
     supplied = request.headers.get("X-Request-ID", "")
     rid = supplied if re.fullmatch(r"[A-Za-z0-9._-]{1,80}", supplied) else str(uuid4())
     token = request_id.set(rid)
@@ -115,7 +116,7 @@ async def observe_request(request: Request, call_next):
 
 
 @app.exception_handler(RateLimitExceeded)
-async def limited(request: Request, exc: RateLimitExceeded):
+async def limited(request: Request, exc: RateLimitExceeded) -> JSONResponse:
     return JSONResponse(
         status_code=429,
         content={"detail": "Too many complaints; try again later."},
@@ -124,15 +125,15 @@ async def limited(request: Request, exc: RateLimitExceeded):
 
 
 @app.exception_handler(RedisError)
-async def redis_unavailable(request: Request, exc: RedisError):
+async def redis_unavailable(request: Request, exc: RedisError) -> JSONResponse:
     return JSONResponse(status_code=503, content={"detail": "Redis unavailable; retry shortly."})
 
 
 @app.exception_handler(SQLAlchemyError)
-async def database_unavailable(request: Request, exc: SQLAlchemyError):
+async def database_unavailable(request: Request, exc: SQLAlchemyError) -> JSONResponse:
     return JSONResponse(status_code=503, content={"detail": "Database unavailable; retry shortly."})
 
 
 @app.get("/metrics", include_in_schema=False)
-def metrics():
+def metrics() -> Response:
     return Response(generate_latest(), headers={"Content-Type": CONTENT_TYPE_LATEST})

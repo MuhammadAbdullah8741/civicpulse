@@ -4,10 +4,10 @@ from uuid import UUID, uuid4
 
 from app.providers.triage.base import TriageProvider
 from app.repositories import complaints as repository
-from app.schemas import ComplaintCreate, ComplaintResponse, Status
+from app.schemas import Category, ComplaintCreate, ComplaintResponse, Priority, Status
+from app.services.stats import invalidate
 from app.services.status import allowed_transitions, validate_transition
 from app.services.triage_cache import triage_with_cache
-from app.services.stats import invalidate
 
 
 class ComplaintNotFoundError(Exception):
@@ -55,7 +55,10 @@ def get(complaint_id: UUID) -> ComplaintResponse:
     return as_response(row)
 
 
-def list_page(category, priority, status, page: int, page_size: int):
+def list_page(
+    category: Category | None, priority: Priority | None, status: Status | None,
+    page: int, page_size: int,
+) -> dict[str, Any]:
     rows, total = repository.list_page(
         category, priority, status, page, page_size
     )

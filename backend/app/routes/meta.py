@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -28,7 +29,7 @@ class ProviderMetadata(BaseModel):
 
 
 @router.get("/providers", response_model=ProviderMetadata)
-def get_providers():
+def get_providers() -> dict[str, Any]:
     try:
         return provider_metadata(create_provider().name)
     except RedisError:

@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from typing import Any
 
 from pydantic import BaseModel, ValidationError
 from redis.exceptions import RedisError
@@ -42,7 +43,7 @@ def invalidate() -> None:
         logging.getLogger(__name__).warning("stats_invalidation_unavailable")
 
 
-def get_stats() -> tuple[dict, str]:
+def get_stats() -> tuple[dict[str, Any], str]:
     generation_key, data_key = keys()
     client = get_cache()
     try:
@@ -61,7 +62,7 @@ def get_stats() -> tuple[dict, str]:
     data = aggregate()
     try:
         client.eval(STORE_IF_CURRENT, 2, generation_key, data_key,
-                    str(generation or "0"), json.dumps(data), TTL_SECONDS)
+                    str(generation or "0"), json.dumps(data), str(TTL_SECONDS))
     except RedisError:
         pass
     return data, "MISS"
