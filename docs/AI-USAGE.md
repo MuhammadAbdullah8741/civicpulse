@@ -1,0 +1,73 @@
+# AI assistance record
+
+Tool: ChatGPT/Codex. The assistant supplied substantial implementation code,
+PowerShell commands, tests and documentation. The students installed files,
+ran commands and supplied terminal output. AI authorship is disclosed; partner
+contributions and review must be recorded honestly under their own identities.
+
+## Supplied work
+
+Initial FastAPI setup, Docker and Compose configuration, PostgreSQL/Alembic
+schema, seed data, complaint API and state machine, readiness checks, GitHub CI,
+triage interface and four providers, retry/fallback, Redis triage caching,
+provider-history endpoint, test cases and provider/privacy documentation.
+
+## Changes made during the guided work
+
+- Coverage output moved to /tmp because the non-root container could not write
+  its SQLite coverage file in the mounted /app directory on the CI runner.
+- Groq model changed from llama-3.1-8b-instant to openai/gpt-oss-20b after an
+  actual 404/model_not_found response and account model-list inspection.
+- Ollama was initially deferred because of download size, then restored with
+  the local-ai profile and persistent volume following the student's decision.
+- Cached fallback results are excluded so temporary outages do not suppress
+  recovery for 24 hours. CI explicitly selects simulated triage.
+
+## Observed verification from student terminal output
+
+- Initial health test: 1 passed; /health returned status ok.
+- Seed inserted 30 rows, repeat inserted zero; Compose down/up preserved rows.
+- Complaint API phase: 53 tests passed, approximately 86% coverage.
+- Ollama phase: 72 tests passed, 87.63% coverage; live Ollama returned water/high.
+- Cache phase: 79 tests passed, 90.08% coverage; controlled duplicate-input hit
+  rate 50% (1 hit / 2 requests), provider history endpoint succeeded.
+
+## Pending verification and ownership
+
+Final prompt-injection/transport tests, updated CI and partner review must be
+run and their actual results recorded. The team must understand and explain
+all generated code at viva. This document does not claim that AI-generated
+work was independently written by either partner or that unrun tests passed.
+
+## Backend completion phase (verification pending)
+
+ChatGPT supplied statistics aggregation/cache/invalidation, the Redis Lua limiter,
+request-correlated JSON logging, Prometheus metrics, lifespan cleanup, Docker
+shutdown configuration and associated tests. The user requested complete file
+packages and performs all application execution and GitHub operations themselves.
+Only syntax/package inspection was performed by the assistant for this phase.
+Record actual test/CI results after running the package; no pass is claimed here.
+
+## Frontend, infrastructure and final delivery assistance
+
+ChatGPT/Codex also supplied React submit/dashboard/stats files and tests,
+frontend container/runtime configuration, CI security checks, production Compose,
+Kubernetes/Kustomize manifests, local deployment and scaling scripts, delivery
+workflows, SBOM generation, final documentation and the submission checker.
+The students execute commands, review behavior, collect real evidence and
+perform commits and partner reviews. Commit authorship alone does not imply
+independent authorship of generated code.
+
+The final audit found that proxy socket addresses were used directly for rate
+limiting. The Phase 12 patch adds explicit trusted-proxy resolution, rejects
+untrusted forwarding headers and tests client separation. It documents the
+single-trusted-cluster assumption instead of claiming multi-tenant security.
+
+Verification already shown by the students includes 95 backend tests with
+93.03% coverage before Phase 12, a successful Kubernetes Ingress smoke check,
+recorded failed baseline/tuned load thresholds, and a successful 5401-request
+rolling update with zero failed requests and zero dropped iterations. Phase 11
+local output showed 14 helper tests and actionlint passing. The Phase 12
+assistant-side run passed 76 backend tests and skipped 26 requiring services;
+Ruff and mypy passed. Full database integration and remote CD/release validation
+remain student-run gates. Record their actual results before submission.

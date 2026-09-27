@@ -1,0 +1,124 @@
+name: CD
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      release_tag:
+        description: Validated version tag supplied by the release workflow
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+# Serialize publishing and deployment, including calls from release.yml.
+concurrency:
+  group: civicpulse-delivery
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Full suite
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  build-push:
+    name: Build, scan, SBOM and publish
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      backend_image: ${{ steps.publish.outputs.backend_image }}
+      frontend_image: ${{ steps.publish.outputs.frontend_image }}
+      backend_digest: ${{ steps.publish.outputs.backend_digest }}
+      frontend_digest: ${{ steps.publish.outputs.frontend_digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Authenticate to GHCR with the job token
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$REGISTRY_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+      - name: Publish scanned images and record immutable references
+        id: publish
+        env:
+          RELEASE_TAG: ${{ inputs.release_tag || '' }}
+        run: python scripts/publish_images.py
+      - name: Upload SBOMs, image digests and scan reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: delivery-images
+          path: delivery-artifacts/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Log out
+        if: always()
+        run: docker logout ghcr.io
+
+  deploy-k8s:
+    name: Deploy published images to temporary Kubernetes
+    needs: build-push
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    env:
+      BACKEND_IMAGE: ${{ needs.build-push.outputs.backend_image }}
+      FRONTEND_IMAGE: ${{ needs.build-push.outputs.frontend_image }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.35.8'
+      - name: Install checksum-verified k3d
+        run: python scripts/install_ci_k3d.py
+      - name: Create temporary cluster
+        run: k3d cluster create civicpulse-ci --image rancher/k3s:v1.35.8-k3s1 --servers 1 --agents 1 --api-port 127.0.0.1:6550 --port '127.0.0.1:8082:80@loadbalancer' --wait --timeout 180s
+      - name: Deploy production overlay and migrate
+        env:
+          REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/deploy_ci.py
+      - name: Resolve the local Ingress host
+        run: echo '127.0.0.1 civicpulse.localhost' | sudo tee -a /etc/hosts
+      - name: Smoke test published images through Ingress
+        env:
+          FRONTEND_URL: http://civicpulse.localhost:8082
+        run: |
+          set -euo pipefail
+          mkdir -p delivery-evidence
+          node frontend/scripts/smoke-container.mjs --write | tee delivery-evidence/smoke.log
+          kubectl --context k3d-civicpulse-ci -n civicpulse get hpa | tee delivery-evidence/hpa.txt
+      - name: Collect status and events
+        if: always()
+        run: |
+          mkdir -p delivery-evidence
+          kubectl --context k3d-civicpulse-ci -n civicpulse get pods,deployments,statefulsets,services,ingress,pvc,hpa -o wide > delivery-evidence/resources.txt 2>&1 || true
+          kubectl --context k3d-civicpulse-ci -n civicpulse get events --sort-by=.lastTimestamp > delivery-evidence/events.txt 2>&1 || true
+      - name: Upload deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: delivery-deployment
+          path: delivery-evidence/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Delete only the temporary CI cluster
+        if: always()
+        run: k3d cluster delete civicpulse-ci

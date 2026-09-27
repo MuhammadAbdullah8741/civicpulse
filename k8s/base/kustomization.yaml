@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: civicpulse
+resources:
+- namespace.yaml
+- config.yaml
+- backend.yaml
+- frontend.yaml
+- services.yaml
+- database.yaml
+- cache.yaml
+- ingress.yaml
+- scaling.yaml
+patches:
+- path: backend-vpa-requests.yaml
+- path: backend-probes.yaml

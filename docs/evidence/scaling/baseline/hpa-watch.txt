@@ -1,0 +1,23 @@
+NAME      REFERENCE            TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+backend   Deployment/backend   cpu: 4%/60%   2         10        2          3h41m
+backend   Deployment/backend   cpu: 11%/60%   2         10        2          3h41m
+backend   Deployment/backend   cpu: 15%/60%   2         10        2          3h42m
+backend   Deployment/backend   cpu: 232%/60%   2         10        2          3h42m
+backend   Deployment/backend   cpu: 501%/60%   2         10        6          3h42m
+backend   Deployment/backend   cpu: 432%/60%   2         10        10         3h42m
+backend   Deployment/backend   cpu: 291%/60%   2         10        10         3h43m
+backend   Deployment/backend   cpu: 130%/60%   2         10        10         3h43m
+backend   Deployment/backend   cpu: 122%/60%   2         10        10         3h43m
+backend   Deployment/backend   cpu: 123%/60%   2         10        10         3h44m
+backend   Deployment/backend   cpu: 130%/60%   2         10        10         3h44m
+backend   Deployment/backend   cpu: 121%/60%   2         10        10         3h44m
+backend   Deployment/backend   cpu: 120%/60%   2         10        10         3h44m
+backend   Deployment/backend   cpu: 80%/60%    2         10        10         3h45m
+backend   Deployment/backend   cpu: 5%/60%     2         10        10         3h45m
+backend   Deployment/backend   cpu: 4%/60%     2         10        10         3h45m
+backend   Deployment/backend   cpu: 3%/60%     2         10        10         3h47m
+backend   Deployment/backend   cpu: 4%/60%     2         10        10         3h47m
+backend   Deployment/backend   cpu: 3%/60%     2         10        10         3h48m
+backend   Deployment/backend   cpu: 4%/60%     2         10        10         3h48m
+backend   Deployment/backend   cpu: 3%/60%     2         10        10         3h50m
+backend   Deployment/backend   cpu: 3%/60%     2         10        10         3h50m

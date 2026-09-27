@@ -1,0 +1,25 @@
+NAME      REFERENCE            TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+backend   Deployment/backend   cpu: 4%/60%   2         10        2          3h52m
+backend   Deployment/backend   cpu: 6%/60%   2         10        2          3h52m
+backend   Deployment/backend   cpu: 14%/60%   2         10        2          3h53m
+backend   Deployment/backend   cpu: 84%/60%   2         10        2          3h53m
+backend   Deployment/backend   cpu: 460%/60%   2         10        3          3h53m
+backend   Deployment/backend   cpu: 495%/60%   2         10        7          3h53m
+backend   Deployment/backend   cpu: 428%/60%   2         10        10         3h54m
+backend   Deployment/backend   cpu: 127%/60%   2         10        10         3h54m
+backend   Deployment/backend   cpu: 84%/60%    2         10        10         3h54m
+backend   Deployment/backend   cpu: 79%/60%    2         10        10         3h54m
+backend   Deployment/backend   cpu: 119%/60%   2         10        10         3h55m
+backend   Deployment/backend   cpu: 93%/60%    2         10        10         3h55m
+backend   Deployment/backend   cpu: 83%/60%    2         10        10         3h55m
+backend   Deployment/backend   cpu: 75%/60%    2         10        10         3h55m
+backend   Deployment/backend   cpu: 72%/60%    2         10        10         3h56m
+backend   Deployment/backend   cpu: 64%/60%    2         10        10         3h56m
+backend   Deployment/backend   cpu: 11%/60%    2         10        10         3h56m
+backend   Deployment/backend   cpu: 5%/60%     2         10        10         3h56m
+backend   Deployment/backend   cpu: 4%/60%     2         10        10         3h57m
+backend   Deployment/backend   cpu: 5%/60%     2         10        10         3h59m
+backend   Deployment/backend   cpu: 4%/60%     2         10        10         3h59m
+backend   Deployment/backend   cpu: 5%/60%     2         10        10         4h
+backend   Deployment/backend   cpu: 4%/60%     2         10        10         4h1m
+backend   Deployment/backend   cpu: 4%/60%     2         10        10         4h1m

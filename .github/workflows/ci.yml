@@ -1,0 +1,206 @@
+name: CI
+
+on:
+  workflow_call:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [dev]
+
+env:
+  TRIAGE_PROVIDER: simulated
+  SIMULATED_MODE: success
+
+permissions:
+  contents: read
+
+jobs:
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Lint backend
+        run: python -m ruff check app tests alembic
+
+      - name: Type-check application
+        run: python -m mypy app
+
+      - name: Run backend tests
+        run: python -m pytest -q
+
+  database-integration:
+    timeout-minutes: 20
+    env:
+      COMPOSE_FILE: compose.yaml:compose.frontend.yaml
+    name: Database integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node for contract and smoke checks
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Create temporary environment
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import secrets
+          Path(".env").write_text(
+              "POSTGRES_DB=civicpulse\n"
+              "POSTGRES_USER=civicpulse\n"
+              f"POSTGRES_PASSWORD={secrets.token_hex(24)}\n"
+              "TRIAGE_PROVIDER=simulated\n"
+          )
+          PY
+
+      - name: Build and start services
+        run: docker compose up -d --build --wait --wait-timeout 180
+
+      - name: Apply migrations
+        run: docker compose exec -T backend alembic upgrade head
+
+      - name: Run tests against PostgreSQL
+        run: docker compose exec -T -e RUN_DB_TESTS=1 -e COVERAGE_FILE=/tmp/civicpulse.coverage backend python -m pytest -q -p no:cacheprovider --cov=app --cov-report=term-missing --cov-fail-under=65
+
+      - name: Verify repeatable seed
+        run: |
+          docker compose exec -T backend python -m app.seed
+          result=$(docker compose exec -T backend python -m app.seed)
+          echo "$result"
+          test "$result" = "Inserted: 0; total complaints: 30"
+
+      - name: Check live frontend API contract
+        run: node frontend/scripts/check-api.mjs
+
+      - name: Verify frontend runtime user
+        run: test "$(docker compose exec -T frontend id -u)" = "101"
+
+      - name: Run frontend proxy end-to-end smoke test
+        run: node frontend/scripts/smoke-container.mjs --write
+
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=100
+
+      - name: Stop temporary services
+        if: always()
+        run: docker compose down -v
+
+  frontend-checks:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Lint and check TypeScript
+        run: npm run lint
+
+      - name: Run frontend tests
+        run: npm test
+
+      - name: Build production assets
+        run: npm run build
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+  container-security:
+    name: Container security
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build application images without publishing
+        run: |
+          docker build -t civicpulse-backend:ci ./backend
+          docker build -t civicpulse-frontend:ci ./frontend
+
+      - name: Scan fixable high and critical vulnerabilities
+        run: python scripts/scan_images.py --output security-reports civicpulse-backend:ci civicpulse-frontend:ci
+
+      - name: Upload vulnerability reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-security-reports
+          path: security-reports/*.json
+          if-no-files-found: warn
+          retention-days: 7
+
+  kubernetes-manifests:
+    name: Kubernetes manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.35.8'
+      - name: Validate both overlays and migration Job
+        shell: bash
+        run: |
+          set -euo pipefail
+          for overlay in dev prod; do
+            kubectl kustomize "k8s/overlays/$overlay" | docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 -strict -summary -kubernetes-version 1.35.0
+          done
+          docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 -strict -summary -kubernetes-version 1.35.0 < k8s/jobs/migrate.yaml
+
+  delivery-validation:
+    name: Delivery workflow validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate delivery helpers
+        run: python -m unittest discover -s tests/delivery -v
+      - name: Validate workflow syntax and job dependencies
+        run: docker run --rm --mount "type=bind,source=$PWD,target=/repo" -w /repo rhysd/actionlint:1.7.7 -color

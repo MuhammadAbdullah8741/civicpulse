@@ -1,0 +1,29 @@
+{
+  "before": {
+    "cpu": "100m",
+    "memory": "128Mi"
+  },
+  "after": {
+    "cpu": "163m",
+    "memory": "262144k"
+  },
+  "recommendation": {
+    "containerName": "backend",
+    "lowerBound": {
+      "cpu": "25m",
+      "memory": "262144k"
+    },
+    "target": {
+      "cpu": "163m",
+      "memory": "262144k"
+    },
+    "uncappedTarget": {
+      "cpu": "163m",
+      "memory": "262144k"
+    },
+    "upperBound": {
+      "cpu": "11004m",
+      "memory": "6639749015"
+    }
+  }
+}

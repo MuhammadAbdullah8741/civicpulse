@@ -1,0 +1,6 @@
+{
+  "source_commit": "bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1",
+  "backend": "civicpulse-backend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1",
+  "frontend": "civicpulse-frontend:bb2452e3a21a0b2f722c786a1ecdedd7a0b210b1",
+  "note": "Controlled same-bytes image-tag change; demonstrates mechanics, not a functional regression."
+}

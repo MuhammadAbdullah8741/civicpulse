@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: civicpulse-migrate
+  namespace: civicpulse
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      containers:
+      - name: migrate
+        image: civicpulse-backend:dev
+        imagePullPolicy: IfNotPresent
+        command:
+        - python
+        - -m
+        - alembic
+        - upgrade
+        - head
+        envFrom:
+        - configMapRef:
+            name: civicpulse-config
+        - secretRef:
+            name: civicpulse-secrets
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 10001
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
