@@ -171,3 +171,21 @@ jobs:
           path: security-reports/*.json
           if-no-files-found: warn
           retention-days: 7
+
+  kubernetes-manifests:
+    name: Kubernetes manifests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.35.8'
+      - name: Validate both overlays and migration Job
+        shell: bash
+        run: |
+          set -euo pipefail
+          for overlay in dev prod; do
+            kubectl kustomize "k8s/overlays/$overlay" | docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 -strict -summary -kubernetes-version 1.35.0
+          done
+          docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 -strict -summary -kubernetes-version 1.35.0 < k8s/jobs/migrate.yaml
