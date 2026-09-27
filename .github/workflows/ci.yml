@@ -31,10 +31,18 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: backend/requirements.txt
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
 
       - name: Install dependencies
-        run: python -m pip install -r requirements.txt
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Lint backend
+        run: python -m ruff check app tests alembic
+
+      - name: Type-check application
+        run: python -m mypy app
 
       - name: Run backend tests
         run: python -m pytest -q
@@ -133,3 +141,33 @@ jobs:
 
       - name: Audit dependencies
         run: npm audit --audit-level=high
+
+  container-security:
+    name: Container security
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build application images without publishing
+        run: |
+          docker build -t civicpulse-backend:ci ./backend
+          docker build -t civicpulse-frontend:ci ./frontend
+
+      - name: Scan fixable high and critical vulnerabilities
+        run: python scripts/scan_images.py --output security-reports civicpulse-backend:ci civicpulse-frontend:ci
+
+      - name: Upload vulnerability reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: container-security-reports
+          path: security-reports/*.json
+          if-no-files-found: warn
+          retention-days: 7
