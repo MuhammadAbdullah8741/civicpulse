@@ -1,0 +1,25 @@
+NAME      REFERENCE            TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+backend   Deployment/backend   cpu: 2%/60%   2         10        2          4h10m
+backend   Deployment/backend   cpu: 3%/60%   2         10        2          4h10m
+backend   Deployment/backend   cpu: 5%/60%   2         10        2          4h11m
+backend   Deployment/backend   cpu: 16%/60%   2         10        2          4h11m
+backend   Deployment/backend   cpu: 150%/60%   2         10        2          4h11m
+backend   Deployment/backend   cpu: 217%/60%   2         10        5          4h11m
+backend   Deployment/backend   cpu: 156%/60%   2         10        5          4h12m
+backend   Deployment/backend   cpu: 80%/60%    2         10        5          4h12m
+backend   Deployment/backend   cpu: 77%/60%    2         10        7          4h12m
+backend   Deployment/backend   cpu: 79%/60%    2         10        7          4h12m
+backend   Deployment/backend   cpu: 59%/60%    2         10        7          4h13m
+backend   Deployment/backend   cpu: 55%/60%    2         10        7          4h13m
+backend   Deployment/backend   cpu: 54%/60%    2         10        7          4h13m
+backend   Deployment/backend   cpu: 55%/60%    2         10        7          4h14m
+backend   Deployment/backend   cpu: 55%/60%    2         10        7          4h14m
+backend   Deployment/backend   cpu: 17%/60%    2         10        7          4h14m
+backend   Deployment/backend   cpu: 5%/60%     2         10        7          4h14m
+backend   Deployment/backend   cpu: 2%/60%     2         10        7          4h15m
+backend   Deployment/backend   cpu: 2%/60%     2         10        7          4h15m
+backend   Deployment/backend   cpu: 2%/60%     2         10        7          4h15m
+backend   Deployment/backend   cpu: 3%/60%     2         10        7          4h16m
+backend   Deployment/backend   cpu: 2%/60%     2         10        7          4h17m
+backend   Deployment/backend   cpu: 2%/60%     2         10        7          4h19m
+backend   Deployment/backend   cpu: 2%/60%     2         10        2          4h19m
