@@ -1,0 +1,6 @@
+﻿PASS: frontend network namespace could not reach PostgreSQL TCP port.
+PASS: backend connected to PostgreSQL.
+Database address tested: 172.22.0.3
+Image tag: sha-66563b1803475d8d17a80b5625774770457b3d53
+Commit: 66563b1803475d8d17a80b5625774770457b3d53
+Recorded: 2026-09-27T22:13:25.3633464+05:00
