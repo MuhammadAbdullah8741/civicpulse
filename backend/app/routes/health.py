@@ -12,7 +12,7 @@ def health() -> dict[str, str]:
 
 
 @router.get("/ready", tags=["operations"])
-def ready():
+def ready() -> JSONResponse:
     dependencies = dependency_status()
     healthy = all(value == "ok" for value in dependencies.values())
 

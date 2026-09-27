@@ -10,7 +10,6 @@ from app.services.status import (
     validate_transition,
 )
 
-
 VALID_PAIRS = {
     (Status.OPEN, Status.IN_PROGRESS),
     (Status.OPEN, Status.REJECTED),

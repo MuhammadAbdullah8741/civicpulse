@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request
@@ -29,7 +29,7 @@ def create_complaint(
     payload: ComplaintCreate,
     request: Request,
     provider: Annotated[TriageProvider, Depends(get_triage_provider)],
-):
+) -> ComplaintResponse:
     check(request.client.host if request.client else "unknown")
     return service.create(payload, provider)
 
@@ -41,16 +41,16 @@ def list_complaints(
     status: Status | None = None,
     page: Annotated[int, Query(ge=1)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
-):
+) -> dict[str, Any]:
     return service.list_page(category, priority, status, page, page_size)
 
 
 @router.get("/{complaint_id}", response_model=ComplaintResponse)
-def get_complaint(complaint_id: UUID):
+def get_complaint(complaint_id: UUID) -> ComplaintResponse:
     return service.get(complaint_id)
 
 
 @router.patch("/{complaint_id}/status", response_model=ComplaintResponse)
-def update_complaint_status(complaint_id: UUID, payload: StatusUpdate):
+def update_complaint_status(complaint_id: UUID, payload: StatusUpdate) -> ComplaintResponse:
     return service.change_status(complaint_id, payload.status)
 

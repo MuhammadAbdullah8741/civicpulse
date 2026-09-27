@@ -1,5 +1,6 @@
 import hashlib
 import os
+from typing import cast
 
 from app.providers.cache import get_cache
 
@@ -12,7 +13,7 @@ return {count, redis.call('TTL', KEYS[1])}
 
 
 class RateLimitExceeded(Exception):
-    def __init__(self, retry_after: int):
+    def __init__(self, retry_after: int) -> None:
         self.retry_after = retry_after
 
 
@@ -24,6 +25,7 @@ def key_for(ip: str) -> str:
 def check(ip: str) -> None:
     limit = max(1, int(os.getenv("RATE_LIMIT_REQUESTS", "10")))
     window = max(1, int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60")))
-    count, ttl = get_cache().eval(SCRIPT, 1, key_for(ip), window)
+    # redis-py shares response annotations with async clients; this client is synchronous.
+    count, ttl = cast(list[int], get_cache().eval(SCRIPT, 1, key_for(ip), str(window)))
     if int(count) > limit:
         raise RateLimitExceeded(max(1, int(ttl)))

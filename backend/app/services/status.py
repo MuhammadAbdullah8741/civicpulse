@@ -1,6 +1,5 @@
 from app.schemas import Status
 
-
 TRANSITIONS: dict[Status, tuple[Status, ...]] = {
     Status.OPEN: (Status.IN_PROGRESS, Status.REJECTED),
     Status.IN_PROGRESS: (Status.RESOLVED, Status.REJECTED),
