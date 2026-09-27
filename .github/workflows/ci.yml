@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_call:
   pull_request:
     branches: [main, dev]
   push:
@@ -189,3 +190,17 @@ jobs:
             kubectl kustomize "k8s/overlays/$overlay" | docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 -strict -summary -kubernetes-version 1.35.0
           done
           docker run --rm -i ghcr.io/yannh/kubeconform:v0.7.0 -strict -summary -kubernetes-version 1.35.0 < k8s/jobs/migrate.yaml
+
+  delivery-validation:
+    name: Delivery workflow validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate delivery helpers
+        run: python -m unittest discover -s tests/delivery -v
+      - name: Validate workflow syntax and job dependencies
+        run: docker run --rm --mount "type=bind,source=$PWD,target=/repo" -w /repo rhysd/actionlint:1.7.7 -color
