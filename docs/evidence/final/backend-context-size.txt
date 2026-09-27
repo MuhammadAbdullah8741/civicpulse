@@ -1,0 +1,4 @@
+Before ignore: 111 files, 373392 bytes
+After exclusions: 59 files, 93646 bytes
+Measurement: sum of file sizes, not Docker tar-transfer or image size.
+Scope: current simple backend .dockerignore exclusions.
