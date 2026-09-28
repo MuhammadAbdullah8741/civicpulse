@@ -1,3 +1,5 @@
+> Historical audit: this document describes an earlier snapshot. Its missing-evidence list is not the current status. See [the updated evidence index](evidence/final/README.md) and run scripts/check_submission.py for the current mechanical checks.
+
 # CivicPulse final submission audit
 
 Audited: user-supplied `civicpulse (2).zip` against Assignment 01, sections 2–5.
