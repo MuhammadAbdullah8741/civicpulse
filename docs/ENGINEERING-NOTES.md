@@ -95,22 +95,14 @@ do not imply a Kubernetes NetworkPolicy implementation.
 
 ## 8. Failure investigation and reflection
 
-The recorded scaling investigation found backend readiness loss and missing HPA
-metrics. Restarting the failed local agent restored database/cache and then
-backend readiness. A later tuned run still had 28 failed requests and a backend
-restart. The prior process exited with code 0; pod events explicitly said the
-liveness probe failed and Kubernetes killed the container. Thus this was not
-established as an OOM crash. Commands were `kubectl describe pod` and
-`kubectl logs POD --previous`; the evidence discussion is in
-`docs/evidence/scaling/PROBE-ADJUSTMENT.md`. Liveness tolerance changed separately
-from readiness (`k8s/base/backend-probes.yaml:15`). That does
-not prove the restart caused all 28 failures.
+During the Kubernetes scaling experiment, the backend became unready and the HPA could not obtain CPU metrics. The cause was initially unclear. With AI-assisted guidance, I used pod status, events and previous container logs to investigate. Restarting the local agent restored database/cache availability and backend readiness. A later backend restart was explicitly linked to failed liveness probes. We increased the liveness timeout to five seconds and the failure threshold to six, leaving readiness unchanged. The subsequent rolling-update experiment completed 5,401 requests with no failed requests or dropped iterations. However, this did not erase the earlier load-test failures or prove that every failed request had the same cause. I did not record the investigation time separately, so I cannot reliably state its duration. This experience showed me the importance of checking node health, dependencies and termination events before changing configuration. Next time, I would record investigation timestamps and change one setting at a time to make the results easier to interpret.
 
-**Student completion required:** add the actual time spent and what you personally
-believed first. The logs establish the technical sequence, but do not establish
-that this one investigation took more than an hour or what either partner
-thought. If another incident truly took more than an hour, use that incident
-with its real command/log evidence instead. Do not invent an experience.
+Supporting code and recorded evidence for question 8:
+`k8s/base/backend-probes.yaml:15` specifies the adjusted liveness timeout;
+`docs/evidence/scaling/PROBE-ADJUSTMENT.md` records the interpretation;
+`docs/evidence/scaling/rollout/result.json` records the subsequent rollout result.
+The actual time spent and initial incorrect belief remain unestablished; this
+reflection does not claim to meet those parts of question 8.
 
 ## Database index rationale
 

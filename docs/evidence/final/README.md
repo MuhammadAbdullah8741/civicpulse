@@ -1,26 +1,27 @@
 # Final evidence index
 
-The existing scaling JSON/CSV/logs and SVG charts are real recorded runs.
-The files listed below must be captured from the team's actual environment.
-Do not substitute generated screenshots or claim that a blank checklist passed.
+These are original user captures copied without image-content changes.
 
-| File | Capture |
+| File | What it proves / limits |
 |---|---|
-| branch-protection.png | main protection requiring PR, CI and partner approval |
-| blocked-ci.png | Deliberately failing test in a real PR and blocked merge button |
-| fixed-ci.png | Same PR after fixing the test, with green checks |
-| merge-conflict.png | Real code conflict and its markers |
-| merge-resolution.png | Reviewed resolution and resulting merge |
-| frontend-submit.png | Synthetic submitted complaint with triage/provider visible |
-| frontend-dashboard.png | Filters, pagination and status actions |
-| frontend-stats.png | Counts, X-Cache state and provider outcomes |
-| network-isolation.txt | Frontend database connection attempt fails; backend check succeeds |
-| rollback.txt | Both imperative rollback and declarative previous-overlay application |
+| frontend-submit.png | Successful synthetic report with category, priority, summary, provider and reference |
+| frontend-dashboard.png | Complaint list, filters and status controls; pagination is outside this capture |
+| frontend-stats.png | Aggregate counts, X-Cache MISS, 0/5 runtime triage hit rate |
+| frontend-provider-outcomes.png | Active simulated provider and recent latency/outcome records |
+| branch-protection.png | PR plus one approval required; only Backend tests is listed as a required check in this capture |
+| cd-success.png | Main CD full suite, scan/SBOM/publication and temporary Kubernetes deployment succeeded |
+| review-required.png | Earlier PR blocked for missing approval while CI was green; NOT a failed-CI screenshot |
+| initial-backend-check.png | Initial PR backend check passed; NOT the fixed half of a deliberate red-to-green demonstration |
+| dashboard-status-examples.png | Additional dashboard with terminal and non-terminal statuses |
+| network-isolation.txt | Recorded frontend-to-database failure and backend-to-database success |
+| rollback.txt | Recorded imperative and declarative image restoration |
+| rollback-images.json | Source and image references used by the controlled rollback |
+| rollback-previous-overlay.yaml | Prior manifest used for declarative restoration; no Secret object included |
 
-Save screenshots here under these filenames, or update the paths in
-../../submission.json to match real evidence already saved elsewhere.
-Also record five Issue-linked, reviewed merged PR URLs in that JSON.
+Still absent: blocked-ci.png, fixed-ci.png, merge-conflict.png and
+merge-resolution.png. Capture actual events; do not relabel unrelated screenshots.
+After performing the real conflict, add 2–4 sentences explaining the competing
+changes, chosen resolution and why it preserves the intended behavior.
 
-Add 2-4 sentences below describing the real merge conflict: the two intended
-changes, the chosen combined result, and why it preserves behavior. This must
-be written after observing your actual conflict; no conflict is claimed here.
+The source screenshots remain in the user's screenshots/ folder. The corrected
+copies above match paths in docs/submission.json. See ../../SUBMISSION-AUDIT.md.
