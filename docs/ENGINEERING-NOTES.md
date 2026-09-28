@@ -18,8 +18,6 @@ CD records actual image digests instead.
 
 ## 2. CI/CD maturity
 
-## 2. CI/CD maturity
-
 According to Lecture 03, slide 32, CivicPulse reaches Level 3:
 Continuous Delivery. The lecture describes this level as keeping main
 ready and producing a build artifact so that software stays deployable.
