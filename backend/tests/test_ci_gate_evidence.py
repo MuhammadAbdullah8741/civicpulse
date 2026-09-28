@@ -3,5 +3,5 @@ from app.services.status import allowed_transitions
 
 
 def test_resolved_reports_are_terminal():
-    # Deliberately incorrect expectation for the CI enforcement demonstration.
-    assert allowed_transitions(Status.RESOLVED) == [Status.OPEN]
+    # Resolved complaints are terminal and expose no further status actions.
+    assert allowed_transitions(Status.RESOLVED) == []
