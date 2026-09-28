@@ -18,18 +18,43 @@ CD records actual image digests instead.
 
 ## 2. CI/CD maturity
 
-The repository implements automated integration, gated publication and an
-automated deployment rehearsal: CI checks tests/types/security/manifests,
-CD calls it on the merged main result (`.github/workflows/cd.yml:25`),
-and deployment needs the publishing job (`.github/workflows/cd.yml:70`).
-This is continuous delivery with a disposable deployment test, not demonstrated
-continuous deployment to a persistent production service. The next step would
-be a persistent staging/production target with environment protection, smoke
-checks, monitored promotion and a tested rollback policy. Match the lecture's
-exact rung terminology to Lecture 03 slide 32; the slide was not supplied with
-the repository, so this answer does not invent its labels. Actual success is
-proved by the recorded main CD run, not by merely having workflow files.
+## 2. CI/CD maturity
 
+According to Lecture 03, slide 32, CivicPulse reaches Level 3:
+Continuous Delivery. The lecture describes this level as keeping main
+ready and producing a build artifact so that software stays deployable.
+
+Our pipeline supports this classification through automated verification
+and gated artifact publication. `.github/workflows/cd.yml:3–5` triggers
+CD on pushes to main. The workflow invokes the full CI suite at line 25.
+The build-and-publication job requires those checks to succeed through
+`needs: test` at line 31. It publishes container images and exposes their
+immutable references and digests at lines 37–41. This provides tested,
+traceable artifacts that can be deployed without rebuilding the source.
+
+We also automate deployment verification. The deployment job depends on
+publication at `.github/workflows/cd.yml:70`, consumes its image outputs
+at lines 77–78, and creates a temporary Kubernetes cluster at lines 92–93.
+The successful main CD run and v1.0.1 release workflow demonstrate that
+the pipeline executes successfully.
+
+However, this temporary cluster is a deployment rehearsal rather than a
+persistent production service. Therefore, we do not claim Level 4:
+Continuous Deployment, which the lecture describes as automatically
+shipping changes from main to production.
+
+The next rung is Level 4: Continuous Deployment. To reach it, we would
+extend the existing pipeline to deploy the same verified image digests
+automatically to a persistent production environment after the checks
+pass. This would remove the remaining manual production-deployment step,
+reduce release delay and make delivery to users more consistent.
+
+We already implement several practices associated with the lecture's
+Level 5: Production-grade, including reviews, security scans, smoke tests
+and rollback exercises. These individual practices strengthen our
+pipeline, but they do not establish a complete production-grade operating
+system with persistent staging, controlled promotion and ongoing
+production monitoring.
 ## 3. Build once, deploy many
 
 The publisher captures repository digests (`scripts/publish_images.py:75`)
@@ -42,19 +67,49 @@ use a relative API path while Nginx substitutes the runtime upstream
 environment-specific rebuilds could produce untested bytes or bake in a laptop
 URL. Separate workflow runs can rebuild a SHA; their digests distinguish them.
 
+
 ## 4. Correctness for probabilistic AI
 
-Correctness includes schema validity, permitted category/priority, bounded
-single-line summary, a finite attempt budget, explicit fallback and no obeying
-instructions embedded in complaint data. Exact natural-language wording is not
-a stable correctness oracle. TriageResult validates output
-(`backend/app/providers/triage/base.py:8`); the service
-revalidates every provider response (`backend/app/services/triage.py:34`).
-The prompt separates untrusted complaint data from instructions
-(`backend/app/providers/triage/prompt.py:41`). This reduces
-risk; it is not proof that every semantic prompt injection is impossible.
-CI chooses simulated mode (`.github/workflows/ci.yml:11`)
-and tests malformed output, timeouts, retries and fallback with controlled inputs.
+For CivicPulse, correctness means satisfying the triage contract and
+producing a defensible classification of the complaint. It does not mean
+returning exactly the same natural-language sentence on every live request.
+
+The output must contain an allowed category and priority, a nonblank
+single-line summary of at most 140 characters, and confidence between
+zero and one. Extra fields are rejected. These constraints are defined
+in `backend/app/providers/triage/base.py:8–23`. The service validates
+the provider result again before accepting it
+(`backend/app/services/triage.py:31–34`).
+
+Structural validity alone does not prove semantic correctness. A valid
+JSON object could still classify a burst water pipe incorrectly.
+Therefore, live-provider evaluation also considers whether the category,
+urgency and factual summary match the reported problem. Confidence is
+a provider-supplied score, not a guarantee of accuracy.
+
+Complaint text is treated as untrusted data. The system prompt explicitly
+instructs the model to ignore embedded attempts to change its role,
+rules or output format (`backend/app/providers/triage/prompt.py:20–34`).
+The complaint is placed in a separate user message after contact-detail
+redaction (`backend/app/providers/triage/prompt.py:36–42`). These measures
+reduce risk but do not establish that all prompt injection is impossible.
+
+Failure behavior is also part of correctness. The service retries once
+with jitter only for timeout, HTTP 429 and HTTP 5xx failures
+(`backend/app/services/triage.py:14–20` and `29–38`). When a provider
+cannot produce an acceptable result, the service uses rules and records
+the provider as `rules:fallback`
+(`backend/app/services/triage.py:48–49`).
+
+CI remains deterministic by selecting `TRIAGE_PROVIDER=simulated` and
+`SIMULATED_MODE=success` in `.github/workflows/ci.yml:10–12`, rather than
+depending on a live hosted model. The simulated provider uses fixed
+rule-based behavior and supports controlled error and malformed-output
+modes (`backend/app/providers/triage/simulated.py:13–28`). Tests can
+therefore verify validation, retries and fallback with predictable
+inputs and failures, without depending on API availability, account
+limits or changing model wording. Passing these tests establishes the
+tested software behavior; it does not prove perfect live AI judgment.
 
 ## 5. Measured HPA lag
 
