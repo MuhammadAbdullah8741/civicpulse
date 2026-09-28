@@ -2,8 +2,8 @@
   "repository_url": "https://github.com/MuhammadAbdullah8741/civicpulse",
   "backend_package_url": "https://github.com/users/MuhammadAbdullah8741/packages/container/package/civicpulse-backend",
   "frontend_package_url": "https://github.com/users/MuhammadAbdullah8741/packages/container/package/civicpulse-frontend",
-  "cd_run_url": "",
-  "release_url": "",
+  "cd_run_url": "https://github.com/MuhammadAbdullah8741/civicpulse/actions/runs/36337677592",
+  "release_url": "https://github.com/MuhammadAbdullah8741/civicpulse/releases/tag/v1.0.1",
   "demo_video_url": "",
   "demo_duration_seconds": 0,
   "both_partners_speak": false,
@@ -18,7 +18,13 @@
       "Muhammad Abdullah"
     ]
   ],
-  "reviewed_issue_pr_urls": [],
+  "reviewed_issue_pr_urls": [
+    "https://github.com/MuhammadAbdullah8741/civicpulse/pull/2",
+    "https://github.com/MuhammadAbdullah8741/civicpulse/pull/8",
+    "https://github.com/MuhammadAbdullah8741/civicpulse/pull/20",
+    "https://github.com/MuhammadAbdullah8741/civicpulse/pull/22",
+    "https://github.com/MuhammadAbdullah8741/civicpulse/pull/35"
+  ],
   "evidence": {
     "branch_protection": "docs/evidence/final/branch-protection.png",
     "blocked_ci": "docs/evidence/final/blocked-ci.png",

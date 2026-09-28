@@ -1,0 +1,8 @@
+﻿Kubernetes PostgreSQL persistence verification
+Recorded: 2026-09-27T23:47:26.3267818+05:00
+Original pod UID: bcf6d4e2-7fce-4cf2-ad7f-9f703af8a943
+Replacement pod UID: 51b5523c-249d-4467-9c72-ac39fb4c2b44
+Before count|fingerprint: 35|54e7590484d3949ae5f15c1110767881
+After count|fingerprint: 35|54e7590484d3949ae5f15c1110767881
+PASS: pod replaced; complaint count and complete-row fingerprint unchanged.
+The PostgreSQL PVC was retained.

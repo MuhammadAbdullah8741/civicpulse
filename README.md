@@ -135,3 +135,22 @@ This is an educational demonstration, without operator authentication, TLS
 termination or a citizen-data retention system. Keep it local and use synthetic
 reports. The trusted proxy configuration assumes a dedicated, trusted k3s
 cluster; it is not suitable for an untrusted multi-tenant pod network.
+
+## Application screenshots
+
+Captured from the running application using synthetic reports.
+
+![Successful complaint submission](docs/evidence/final/frontend-submit.png)
+
+![Operations dashboard](docs/evidence/final/frontend-dashboard.png)
+
+![Statistics and actual X-Cache state](docs/evidence/final/frontend-stats.png)
+
+![Recent provider outcomes](docs/evidence/final/frontend-provider-outcomes.png)
+
+The statistics capture reports 0 hits from 5 calls in that runtime. It is
+separate from the controlled duplicate-input benchmark reported in
+[triage cache notes](docs/TRIAGE-CACHE.md).
+
+See the [submission audit](docs/SUBMISSION-AUDIT.md) for remaining evidence
+and the limits of the verification performed.

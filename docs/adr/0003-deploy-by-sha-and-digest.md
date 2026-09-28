@@ -1,6 +1,6 @@
 # ADR 0003: Identify source by Git SHA and deploy published image digests
 
-- Status: Accepted for implementation; live workflow evidence pending the first main run.
+- Status: Accepted; main CD success is recorded in docs/submission.json and docs/evidence/final/cd-success.png. Release success remains separately unverified in this snapshot.
 - Context: Mutable latest tags cannot identify the source or exact artifact running in a cluster.
 
 ## Decision
