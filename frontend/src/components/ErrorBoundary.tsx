@@ -6,7 +6,7 @@ export class ErrorBoundary extends Component<{children: ReactNode}, {failed: boo
   render() {
     if (this.state.failed) return <section className="panel" role="alert">
       <h2>Something went wrong</h2>
-      <p>Reload the page; reports already saved remain available.</p>
+      <p>Reload the page. Reports already saved remain available; unsaved changes may be lost.</p>
       <button onClick={() => window.location.reload()}>Reload application</button>
     </section>;
     return this.props.children;
